@@ -1,18 +1,17 @@
 import domain
 import json
-from dataclasses import dataclass
 from typing import Optional
 
 
-@dataclass(eq=False, frozen=True)
+@domain.entity
 class EntityClass(domain.Entity):
-    value: Optional[int] = None
     value: str = ''
 
     def modify_value(self, value: str):
-        return EntityClass(**self._udpate_fields(fields={
-            'value': value
-        }))
+        processed_value = value
+        return self._modify(
+            value=processed_value
+        )
 
 
 def test_create_instance():
@@ -33,9 +32,19 @@ def test_equal():
 
 
 def test_do_not_allow_destructive_manipulation_of_the_field():
-    entity = EntityClass(id=1, value='')
     try:
+        entity = EntityClass(id=1, value='')
         entity.value = 'Mutated!!'
+        assert False
+    except Exception:
+        assert True
+    try:
+        _ = EntityClass(id=1, value='', mutated='')
+        assert False
+    except Exception:
+        assert True
+    try:
+        EntityClass(**{'id': 1, 'value': '', 'mutated': ''})
         assert False
     except Exception:
         assert True
