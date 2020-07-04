@@ -1,5 +1,4 @@
 import domain
-import json
 from typing import Optional
 
 
@@ -9,7 +8,7 @@ class EntityClass(domain.Entity):
 
     def modify_value(self, value: str):
         processed_value = value
-        return self._modify(
+        return self._update(
             value=processed_value
         )
 
@@ -44,7 +43,7 @@ def test_do_not_allow_destructive_manipulation_of_the_field():
     except Exception:
         assert True
     try:
-        EntityClass(**{'id': 1, 'value': '', 'mutated': ''})
+        _ = EntityClass(**{'id': 1, 'value': '', 'mutated': ''})
         assert False
     except Exception:
         assert True
@@ -62,3 +61,15 @@ def test_export_dict():
     assert {'id': 1, 'value': ''} == EntityClass(id=1, value='').as_dict()
     assert {'id': 1, 'value': ''} == EntityClass(
         **{'id': 1, 'value': ''}).as_dict()
+
+
+def test_role_object():
+    @domain.entity
+    class Role(EntityClass):
+        def role_method(self) -> Optional[int]:
+            return self.id
+    entity = EntityClass(id=1, value='')
+    roled_entity = entity.as_role(Role)
+    assert id(entity) != id(roled_entity)
+    assert entity == roled_entity
+    assert 1 == roled_entity.role_method()
