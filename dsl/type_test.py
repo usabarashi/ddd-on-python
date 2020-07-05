@@ -1,5 +1,6 @@
-from domain.type import Collection, Err, Ok, Result
 from typing import Literal
+
+from dsl.type import Collection, Err, Ok, Result
 
 
 def test_result_ok():

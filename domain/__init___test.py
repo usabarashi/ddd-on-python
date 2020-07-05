@@ -1,5 +1,8 @@
-import domain
+import dataclasses
 from typing import Optional
+
+import domain
+from dsl.type import Collection
 
 
 @domain.entity
@@ -35,17 +38,17 @@ def test_do_not_allow_destructive_manipulation_of_the_field():
         entity = EntityClass(id=1, value='')
         entity.value = 'Mutated!!'
         assert False
-    except Exception:
+    except dataclasses.FrozenInstanceError:
         assert True
     try:
         _ = EntityClass(id=1, value='', mutated='')
         assert False
-    except Exception:
+    except TypeError:
         assert True
     try:
         _ = EntityClass(**{'id': 1, 'value': '', 'mutated': ''})
         assert False
-    except Exception:
+    except TypeError:
         assert True
 
 
@@ -73,3 +76,8 @@ def test_role_object():
     assert id(entity) != id(roled_entity)
     assert entity == roled_entity
     assert 1 == roled_entity.role_method()
+    try:
+        _ = entity.as_role(Collection)
+        assert False
+    except TypeError:
+        assert True

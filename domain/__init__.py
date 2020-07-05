@@ -5,10 +5,12 @@ from typing import Optional, TypeVar
 T = TypeVar('T')
 A = TypeVar('A')
 
+ID = int
+
 
 @dataclass(frozen=True)
 class Entity:
-    id: Optional[int] = field(default=None)
+    id: Optional[ID] = field(default=None)
 
     def __bool__(self) -> bool:
         return self.id is not None and self.id > 0
@@ -24,6 +26,9 @@ class Entity:
         return replace(self, **changes)
 
     def as_role(self, role: type):
+        if issubclass(self.__class__, role):
+            raise TypeError('{ROLE} is not a {SUPER} role object..'.format(
+                ROLE=role.__name__, SUPER=self.__class__.__name__))
         return role(**self.as_dict())
 
     def as_dict(self) -> dict:
@@ -34,10 +39,10 @@ def entity(cls, /):
     return _process_class(cls=cls, init=True, repr=True, eq=False, order=False, unsafe_hash=False, frozen=True)
 
 
-@dataclass(frozen=True)
-class Value(ABC):
-    value: any
-
-
 def value(cls, /):
     return _process_class(cls=cls, init=True, repr=True, eq=False, order=False, unsafe_hash=False, frozen=True)
+
+
+@dataclass(frozen=True)
+class Error(Exception):
+    pass
