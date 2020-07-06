@@ -1,9 +1,7 @@
-from abc import ABC
-from dataclasses import asdict, dataclass, field, replace, _process_class
-from typing import Optional, TypeVar
+__all__ = []
 
-T = TypeVar('T')
-A = TypeVar('A')
+from dataclasses import asdict, dataclass, field, replace, _process_class
+from typing import Optional
 
 ID = int
 
