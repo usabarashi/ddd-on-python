@@ -2,7 +2,7 @@ import dataclasses
 from typing import Optional
 
 import domain
-from dsl.type import Collection
+from dsl.type import ImmutableSequence
 
 
 @domain.entity
@@ -77,7 +77,7 @@ def test_role_object():
     assert entity == roled_entity
     assert 1 == roled_entity.role_method()
     try:
-        _ = entity.as_role(Collection)
+        _ = entity.as_role(ImmutableSequence)
         assert False
     except TypeError:
         assert True
