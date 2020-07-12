@@ -7,6 +7,13 @@ verify_ssl = true
 
 [packages]
 pytest = "*"
+black = "*"
+flake8 = "*"
+mypy = "*"
+pylint = "*"
+fastapi = "*"
+uvicorn = "*"
+pytest-asyncio = "*"
 
 [requires]
 python_version = "3.8"

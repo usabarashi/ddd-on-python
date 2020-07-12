@@ -1,11 +1,11 @@
 import asyncio
 from typing import Optional
+from typing import Awaitable
 
 import domain
 from domain import employee, governance, workflow
 from dsl.type import Err, Ok, Result, ImmutableSequence
 from usecase import workflow_usecase
-import asyncio
 
 
 def test_approve():
