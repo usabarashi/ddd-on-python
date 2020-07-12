@@ -44,7 +44,7 @@ class ViewerRole(employee.Employee):
 
     def view(self, confidential: Confidential[_T]) -> Result[ConfidentialPermissionError, _T]:
         """閲覧する"""
-        if confidential.visible(viewer=self):
-            return confidential.get(vieser=self)
+        if confidential.visible(duties=self.duties):
+            return confidential.get(duties=self.duties)
         else:
             return ConfidentialPermissionError

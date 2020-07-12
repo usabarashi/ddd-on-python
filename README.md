@@ -1,6 +1,6 @@
 # DDD on Python
 
-PythonでDDDする試行作後
+PythonでDDDする試行錯誤
 
 
 ## Run
