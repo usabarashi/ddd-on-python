@@ -73,7 +73,7 @@ def test_role_object():
             return self.id
     entity = EntityClass(id=1, value='')
     roled_entity = entity.as_role(Role)
-    assert id(entity) != id(roled_entity)
+    assert entity is not roled_entity
     assert entity == roled_entity
     assert 1 == roled_entity.role_method()
     try:

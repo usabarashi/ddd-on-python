@@ -54,7 +54,7 @@ def test_immutable_sequence_add():
     # immutable + mutalbe
     collection = ImmutableSequence([0, 1, 2])
     im_collection = collection + [3]
-    assert id(im_collection) != id(collection)
+    assert im_collection is not collection
     assert type(im_collection) == ImmutableSequence
     assert [0, 1, 2, 3] == im_collection == [0, 1, 2, 3]
     assert [0, 1, 2] == collection == [0, 1, 2]
@@ -63,8 +63,8 @@ def test_immutable_sequence_add():
     # immutable + immutable
     other_collection = ImmutableSequence([3, 4, 5])
     ii_collection = collection + other_collection
-    assert id(ii_collection) != id(collection)
-    assert id(ii_collection) != id(other_collection)
+    assert ii_collection is not collection
+    assert ii_collection is not other_collection
     assert type(ii_collection) == ImmutableSequence
     assert [0, 1, 2, 3, 4, 5] == ii_collection == [0, 1, 2, 3, 4, 5]
     assert [0, 1, 2] == collection == [0, 1, 2]
@@ -77,7 +77,7 @@ def test_immutable_sequence_add_warning_case():
     # mutable + immutable
     collection = ImmutableSequence([0, 1, 2])
     mi_collection = [3] + collection
-    assert id(mi_collection) != id(collection)
+    assert mi_collection is not collection
     assert type(mi_collection) != ImmutableSequence
     assert type(mi_collection) == list
     assert [3, 0, 1, 2] == mi_collection == [3, 0, 1, 2]
@@ -107,7 +107,7 @@ def test_immutable_sequence_delitem():
 def test_immutable_sequence_append():
     sequence = ImmutableSequence([0, 1, 2])
     appended_sequence = sequence.append(3)
-    assert id(appended_sequence) != id(sequence)
+    assert appended_sequence is not sequence
     assert type(appended_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [0, 1, 2, 3] == appended_sequence == [0, 1, 2, 3]
@@ -117,8 +117,8 @@ def test_immutable_sequence_extend():
     sequence = ImmutableSequence([0, 1, 2])
     extend_sequence = [3, 4, 5]
     extended_sequence = sequence.extend(extend_sequence)
-    assert id(extended_sequence) != id(sequence)
-    assert id(extended_sequence) != id(extend_sequence)
+    assert extended_sequence is not sequence
+    assert extended_sequence is not extend_sequence
     assert type(extended_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [0, 1, 2, 3, 4, 5] == extended_sequence == [0, 1, 2, 3, 4, 5]
@@ -127,7 +127,7 @@ def test_immutable_sequence_extend():
 def test_immutable_sequence_insert():
     sequence = ImmutableSequence([0, 1, 2])
     inserted_sequence = sequence.insert(1, 9)
-    assert id(inserted_sequence) != id(sequence)
+    assert inserted_sequence is not sequence
     assert type(inserted_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [0, 9, 1, 2] == inserted_sequence == [0, 9, 1, 2]
@@ -137,7 +137,7 @@ def test_immutable_sequence_insert():
 def test_immutable_sequence_remove():
     sequence = ImmutableSequence([0, 1, 2])
     removed_sequence = sequence.remove(1)
-    assert id(removed_sequence) != id(sequence)
+    assert removed_sequence is not sequence
     assert type(removed_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [0, 2] == removed_sequence == [0, 2]
@@ -147,7 +147,7 @@ def test_immutable_sequence_remove():
 def test_immutable_sequence_pop():
     sequence = ImmutableSequence([0, 1, 2])
     poped_sequence = sequence.pop(1)
-    assert id(poped_sequence) != id(sequence)
+    assert poped_sequence is not sequence
     assert type(poped_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [0, 2] == poped_sequence == [0, 2]
@@ -181,7 +181,7 @@ def test_immutable_sequence_count():
 def test_immutable_sequence_sort():
     sequence = ImmutableSequence([0, 1, 2])
     sorted_sequence = sequence.sort(reverse=True)
-    assert id(sorted_sequence) != id(sequence)
+    assert sorted_sequence is not sequence
     assert type(sorted_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [2, 1, 0] == sorted_sequence == [2, 1, 0]
@@ -191,7 +191,7 @@ def test_immutable_sequence_sort():
 def test_immutable_sequence_reverse():
     sequence = ImmutableSequence([0, 1, 2])
     reversed_sequence = sequence.reverse()
-    assert id(reversed_sequence) != id(sequence)
+    assert reversed_sequence is not sequence
     assert type(reversed_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert [2, 1, 0] == reversed_sequence == [2, 1, 0]
@@ -201,7 +201,7 @@ def test_immutable_sequence_reverse():
 def test_immutable_sequence_copy():
     sequence = ImmutableSequence([0, 1, 2])
     copied_sequence = sequence.copy()
-    assert id(copied_sequence) != id(sequence)
+    assert copied_sequence is not sequence
     assert type(copied_sequence) == ImmutableSequence
     assert type(sequence) == ImmutableSequence
     assert copied_sequence == sequence == copied_sequence
@@ -227,7 +227,7 @@ def test_immutable_sequence_size():
 def test_immutable_sequence_map():
     sequence = ImmutableSequence([0, 1, 2])
     mapped_sequence = sequence.map(function=lambda x: x * 2)
-    assert id(mapped_sequence) != id(sequence)
+    assert mapped_sequence is not sequence
     assert [0, 2, 4] == mapped_sequence
 
 
@@ -235,7 +235,7 @@ def test_immutable_sequence_redece():
     sequence = ImmutableSequence([0, 1, 2])
     reduced_sequence = sequence\
         .reduce(function=lambda left, right: left * right)
-    assert id(reduced_sequence) != id(sequence)
+    assert reduced_sequence is not sequence
     assert 0 == reduced_sequence
 
 
