@@ -6,14 +6,13 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-pytest = "*"
-black = "*"
-flake8 = "*"
-mypy = "*"
-pylint = "*"
-fastapi = "*"
-uvicorn = "*"
-pytest-asyncio = "*"
+fastapi = "0.59.3"
+flake8 = "3.8.3"
+mypy = "0.783"
+uvicorn = "0.11.5"
+pydantic = "1.6"
+pylint = "2.5.3"
+pytest = "5.4.3"
 
 [requires]
 python_version = "3.8"

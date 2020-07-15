@@ -120,7 +120,7 @@ class AlreadySottleError(Error):
 
 
 class NotAnApproverError(Error):
-    """商品経路に含まれていないエラー"""
+    """承認経路に含まれていないエラー"""
     pass
 
 

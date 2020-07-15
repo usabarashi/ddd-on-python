@@ -1,0 +1,37 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.117.1/containers/python-3
+{
+	"name": "DDD on Python",
+	"dockerComposeFile": [
+		"../../container/docker-compose.yml"
+	],
+	"service": "backend",
+	"workspaceFolder": "/opt/ddd-on-python",
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.shell.linux": "/bin/bash",
+		"python.pythonPath": "/opt/ddd-on-python/.venv/bin/python",
+		"python.linting.enabled": true,
+		"python.linting.pylintEnabled": true,
+		"python.formatting.autopep8Path": "/opt/ddd-on-python/.venv/bin/autopep8",
+		"python.formatting.blackPath": "/opt/ddd-on-python/.venv/bin/black",
+		"python.formatting.yapfPath": "/opt/ddd-on-python/.venv/bin/yapf",
+		"python.linting.banditPath": "/opt/ddd-on-python/.venv/bin/bandit",
+		"python.linting.flake8Path": "/opt/ddd-on-python/.venv/bin/flake8",
+		"python.linting.mypyPath": "/opt/ddd-on-python/.venv/bin/mypy",
+		"python.linting.pycodestylePath": "/opt/ddd-on-python/.venv/bin/pycodestyle",
+		"python.linting.pydocstylePath": "/opt/ddd-on-python/.venv/bin/pydocstyle",
+		"python.linting.pylintPath": "/opt/ddd-on-python/.venv/bin/pylint",
+		"python.testing.pytestPath": "/opt/ddd-on-python/.venv/bin/pytest"
+	},
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-python.python"
+	]
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "pip3 install --user -r requirements.txt",
+	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "vscode"
+}

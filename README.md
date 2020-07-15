@@ -4,17 +4,18 @@ Trial and error of DDD on Python.
 
 ## Domain model 
 
-![model](packages.png)
+![model](backend/packages.png)
 
 ```
+$ code backend
+$ pipenv shell
 $ pyreverse -o png --ignore=__init___test.py domain/
 ```
 
 ## Set up 
 
-In the Dev Container.
-
 ```
+$ code backend
 $ export PIPENV_VENV_IN_PROJECT=1
 $ pipenv --python 3.8 
 $ pipenv install
@@ -22,32 +23,27 @@ $ pipenv install
 
 ## Run
 
-In the Dev Container.
-
 ```
+$ code backend
 $ pipenv shell
-$ uvicorn main:app --reload --host 0.0.0.0 --port 8000 
+$ python main.py 
 ```
-
-The same as appPort in [devcontainer.json](.devcontainer/devcontainer.json).
-
 
 ## Swagger UI
 
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-
-
 ## Test
 
-In the Dev Container.
-
 ```
+$ code backend
 $ pipenv shell
 $ pytest usecase/
 ```
 
 ## Reference
 
+- [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers)
+- [docker](https://www.docker.com/)
 - [FastAPI](https://fastapi.tiangolo.com/)
 - [Swagger](https://swagger.io/)
