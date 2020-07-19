@@ -1,6 +1,5 @@
 import logging
 from fastapi import FastAPI
-from pydantic import BaseModel
 
 from adapter.interface import commands, query
 
