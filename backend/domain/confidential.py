@@ -3,7 +3,7 @@ from typing import Generic, TypeVar
 
 import domain
 from domain import employee, governance
-from dsl.type import Err, ImmutableSequence, Ok, Result
+from dsl.type import ImmutableSequence, Result
 
 _T = TypeVar('_T')
 

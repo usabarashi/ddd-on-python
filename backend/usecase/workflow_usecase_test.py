@@ -4,7 +4,7 @@ from typing import Awaitable
 
 import domain
 from domain import employee, governance, workflow
-from dsl.type import Err, Ok, Result, ImmutableSequence
+from dsl.type import Err, Ok, ImmutableSequence
 from usecase import workflow_usecase
 
 
