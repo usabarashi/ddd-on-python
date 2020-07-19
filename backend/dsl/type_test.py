@@ -211,12 +211,12 @@ def test_immutable_sequence_copy():
 
 def test_immutable_sequence_empty():
     sequence = ImmutableSequence([0, 1, 2])
-    assert False == sequence.is_empty()
+    assert False is sequence.is_empty()
 
 
 def test_immutable_sequence_non_empty():
     sequence = ImmutableSequence([0, 1, 2])
-    assert True == sequence.non_empty()
+    assert True is sequence.non_empty()
 
 
 def test_immutable_sequence_size():
