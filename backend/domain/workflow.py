@@ -9,80 +9,48 @@ from domain import employee, governance
 from dsl.type import ImmutableSequence, Err, Ok, Result
 
 
-_S = TypeVar('_S')
+_S = TypeVar("_S")
 
 
 class Procedure(Enum):
     """ワークフロー種別"""
+
     JOINING = 0
     RETIREMENT = 1
 
 
-@domain.value
-class Process:
-    """進捗"""
-    approver_id: domain.Id
-    approve: bool = False
-    datetime: Optional[datetime] = None
-    comment: Optional[str] = None
+class Error(Exception):
+    """ワークフローエラー"""
 
-    @property
-    def is_processed(self):
-        """処理の有無"""
-        return self.datetime is not None
+    pass
 
 
-class Route(ImmutableSequence[Process]):
-    """承認経路"""
+class NoNameError(Error):
+    """名称未定義エラー"""
 
-    def __init__(self, iterable: Iterable[Process] = list()):
-        ImmutableSequence.__init__(self, iterable)
-
-    @property
-    def is_complete(self) -> bool:
-        """決済の有無"""
-        return self.map(
-            function=lambda process: process.is_processed
-        ).reduce(
-            function=lambda left, right: left and right)
-
-    def has_approver(self, approver: employee.Employee) -> bool:
-        """承認者に含まれているか否か"""
-        return self.filter(function=lambda process: process.approver_id == approver.id)
-
-    def has_process(self, approver: employee.Employee) -> bool:
-        """承認済みか否か"""
-        return self.filter(
-            function=lambda process:
-            process.approver_id == approver.id and
-            process.datetime is not None)
-
-    def progress_approve(self, approver: employee.Employee, comment: str):
-        """承認を追加する"""
-        return Route(self.map(
-            function=lambda process: Process(approver_id=approver.id,
-                                             approve=True,
-                                             datetime=datetime.now(),
-                                             comment=comment)
-            if process.approver_id == approver.id
-            else process
-        ))
+    pass
 
 
-@ domain.entity
+class NoDescriptionError(Error):
+    """説明未記載エラー"""
+
+    pass
+
+
+class NoJobAuthorityError(Error):
+    """承認権限エラー"""
+
+    pass
+
+
+@domain.entity
 class Workflow(domain.Entity):
     """ワークフロー"""
-    id: Optional[domain.Id] = field(default_factory=None)
-    duties: governance.Duties = governance.Duties.MANAGEMENT_DEPARTMENT
-    procedure: Procedure = Procedure.JOINING
-    applicant_id: domain.Id = 0
-    route: Route = field(default_factory=Route)
 
-    def process(self: _S, approver: employee.Employee, comment: str) -> _S:
-        return self._update(
-            route=self.route.progress_approve(
-                approver=approver, comment=comment)
-        )
+    id: Optional[domain.Id] = field(default_factory=None)
+    name: str = ""
+    description: str = ""
+    duties: governance.Duties = governance.Duties.MANAGEMENT_DEPARTMENT
 
     @staticmethod
     def create_template() -> _S:
@@ -103,48 +71,49 @@ class Repository(ABC):
     async def save(entity: Workflow) -> Awaitable[Workflow]:
         raise NotImplementedError
 
-
-class Error(domain.Error):
-    """ワークフローエラー"""
-    pass
-
-
-class NoJobAuthorityError(Error):
-    """職務権限なしエラー"""
-    pass
+    @classmethod
+    @abstractmethod
+    async def remove(entity: Workflow) -> Awaitable[Workflow]:
+        raise NotImplementedError
 
 
-class AlreadySottleError(Error):
-    """決済済エラー"""
-    pass
+class ManagerRole(employee.Employee):
+    """部門管理者ロール"""
 
+    def create(
+        self, /, *, name: str, description: str, duties: governance.Duties
+    ) -> Result[domain.Error, Workflow]:
+        """ワークフローを新規作成する"""
 
-class NotAnApproverError(Error):
-    """承認経路に含まれていないエラー"""
-    pass
+        if not name:
+            return Err(NoNameError("名称が未定です."))
+        if not description:
+            return Err(NoDescriptionError("説明が未記入です."))
+        if duties not in self.duties:
+            return Err(NoJobAuthorityError("職務権限がありません."))
 
+        return Ok(Workflow(name=name, description=description, duties=duties))
 
-class AlreayApproveError(Error):
-    """承認済みエラー"""
-    pass
+    def edit(
+        self, /, *, workflow: Workflow, name=None, description=None, duties=None
+    ) -> Result[Error, Workflow]:
+        """ワークフローを編集する
+        
+        FIXME: 申請済がある場合はどうする？
+        """
 
+        if not name:
+            return Err(NoNameError("名称が未定です."))
+        if not description:
+            return Err(NoDescriptionError("説明が未記入です."))
+        if (not duties) and (duties not in self.duties):
+            return Err(NoJobAuthorityError("職務権限がありません."))
 
-@domain.entity
-class ApproverRole(employee.Employee):
-    """承認者ロール"""
+        return Ok(
+            workflow._update(
+                name=name if name else workflow.name,
+                description=description if description else description,
+                duties=duties if duties else duties,
+            )
+        )
 
-    def approval(self:  _S, workflow: Workflow, comment: str) -> Result[domain.Error, Workflow]:
-        """承認する"""
-        if workflow.duties not in self.duties:
-            return Err(NoJobAuthorityError('職務権限がありません.'))
-
-        if workflow.route.is_complete:
-            return Err(AlreadySottleError('決裁済みです.'))
-
-        if not workflow.route.has_approver(approver=self):
-            return Err(NotAnApproverError('承認経路に含まれていません.'))
-
-        if workflow.route.has_process(approver=self):
-            return Err(AlreayApproveError('承認済みです.'))
-
-        return Ok(workflow.process(approver=self, comment=comment))
