@@ -1,6 +1,6 @@
 import asyncio
-from typing import Optional
-from typing import Awaitable
+import pytest
+from typing import Awaitable, Optional
 
 import domain
 from domain import application, employee, governance, workflow
@@ -75,7 +75,7 @@ class Test承認:
             )
 
             result = asyncio.run(
-                usecase.approve(actor_id=1, application_id=1, comment="test")
+                usecase.approval(actor_id=1, application_id=1, comment="test")
             )
             assert Ok is type(result)
 
@@ -131,7 +131,7 @@ class Test承認:
             )
 
             result = asyncio.run(
-                usecase.approve(actor_id=1, application_id=1, comment="test")
+                usecase.approval(actor_id=1, application_id=1, comment="test")
             )
             assert Err is type(result)
             assert application.NoJobAuthorityError is type(result.value)

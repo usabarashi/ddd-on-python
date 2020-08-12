@@ -1,7 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
-@router.get("/query/application")
+@router.get(path="/query/application", tags=["query"])
 async def application():
     return {"Hello": "World"}

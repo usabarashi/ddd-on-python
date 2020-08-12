@@ -29,7 +29,7 @@ class WorkflowUsecase:
         """申請する"""
         raise NotImplementedError
 
-    async def approve(
+    async def approval(
         self, /, *, actor_id: domain.Id, application_id: domain.Id, comment: str
     ) -> Awaitable[Result[application.Error, application.Application]]:
         """申請を承認する"""
