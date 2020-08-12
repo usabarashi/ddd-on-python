@@ -4,7 +4,7 @@ Trial and error of DDD on Python.
 
 ## Domain model 
 
-![model](backend/packages.png)
+![model](packages.png)
 
 ```
 $ code backend
