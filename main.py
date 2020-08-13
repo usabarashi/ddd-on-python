@@ -2,12 +2,14 @@ import uvicorn
 from fastapi import FastAPI
 
 # Endpoints
-from adapter.interface.commands import approval as commands_approval
-from adapter.interface.query import application as query_application
+import adapter.interface.auth.token
+import adapter.interface.command.workflow.approval
+import adapter.interface.query.application
 
-app = FastAPI()
-app.include_router(router=commands_approval.router)
-app.include_router(router=query_application.router)
+app = FastAPI(title="DDD on Python")
+app.include_router(router=adapter.interface.auth.token.router)
+app.include_router(router=adapter.interface.command.workflow.approval.router)
+app.include_router(router=adapter.interface.query.application.router)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
