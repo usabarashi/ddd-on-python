@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Awaitable, Iterable, Optional, TypeVar
+from typing import Optional, TypeVar
 from enum import Enum
-from datetime import datetime
-from dataclasses import field
+from dataclasses import dataclass, field
 
 import domain
 from domain import employee, governance
-from dsl.type import ImmutableSequence, Err, Ok, Result
+from dsl.type import Err, Ok, Result
 
 
 _S = TypeVar("_S")
@@ -43,11 +42,11 @@ class NoJobAuthorityError(Error):
     pass
 
 
-@domain.entity
+@dataclass(eq=False, frozen=True)
 class Workflow(domain.Entity):
     """ワークフロー"""
 
-    id: Optional[domain.Id] = field(default_factory=None)
+    id_: Optional[domain.Id] = field(default=None)
     name: str = ""
     description: str = ""
     duties: governance.Duties = governance.Duties.MANAGEMENT_DEPARTMENT
@@ -59,21 +58,19 @@ class Workflow(domain.Entity):
 
 
 class Repository(ABC):
-    """ワークフローリポジトリ"""
-
-    @classmethod
+    @staticmethod
     @abstractmethod
-    async def get(id: int) -> Awaitable[Optional[Workflow]]:
+    async def get(id_: int) -> Optional[Workflow]:
         raise NotImplementedError
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    async def save(entity: Workflow) -> Awaitable[Workflow]:
+    async def save(entity: Workflow) -> Workflow:
         raise NotImplementedError
 
-    @classmethod
+    @staticmethod
     @abstractmethod
-    async def remove(entity: Workflow) -> Awaitable[Workflow]:
+    async def remove(entity: Workflow) -> Workflow:
         raise NotImplementedError
 
 
@@ -98,7 +95,6 @@ class ManagerRole(employee.Employee):
         self, /, *, workflow: Workflow, name=None, description=None, duties=None
     ) -> Result[Error, Workflow]:
         """ワークフローを編集する
-        
         FIXME: 申請済がある場合はどうする？
         """
 
@@ -116,4 +112,3 @@ class ManagerRole(employee.Employee):
                 duties=duties if duties else duties,
             )
         )
-

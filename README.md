@@ -7,7 +7,7 @@ Trial and error of DDD on Python.
 ![model](packages.png)
 
 ```
-$ code backend
+$ code ./ 
 $ pipenv shell
 $ pyreverse -o png --ignore=__init___test.py domain/
 ```
@@ -15,7 +15,7 @@ $ pyreverse -o png --ignore=__init___test.py domain/
 ## Set up 
 
 ```
-$ code backend
+$ code ./ 
 $ export PIPENV_VENV_IN_PROJECT=1
 $ pipenv --python 3.8 
 $ pipenv install
@@ -24,7 +24,7 @@ $ pipenv install
 ## Run
 
 ```
-$ code backend
+$ code ./ 
 $ pipenv shell
 $ python main.py 
 ```
@@ -36,9 +36,9 @@ $ python main.py
 ## Test
 
 ```
-$ code backend
+$ code ./ 
 $ pipenv shell
-$ pytest usecase/
+$ pytest command/
 ```
 
 ## Reference

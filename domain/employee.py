@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod 
-from dataclasses import field
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Awaitable, Optional, TypeVar
+from typing import Optional, TypeVar
 
 import domain
 from domain import governance
@@ -10,28 +10,26 @@ from dsl.type import ImmutableSequence
 _S = TypeVar("_S")
 
 
-@domain.entity
+@dataclass(eq=False, frozen=True)
 class Employee(domain.Entity):
     """社員"""
 
-    id: Optional[domain.Id] = field(default_factory=None)
-    account: str = field(default="")
-    name: str = field(default="")
-    mail_address: str = field(default="")
+    id: Optional[domain.Id] = field(default=None)
+    account: str = ""
+    name: str = ""
+    mail_address: str = ""
     duties: ImmutableSequence[governance.Duties] = field(
         default_factory=ImmutableSequence
     )
-    join_date: Optional[datetime.date] = field(default_factory=None)
-    retirement_date: Optional[datetime.date] = field(default_factory=None)
+    join_date: Optional[datetime] = field(default=None)
+    retirement_date: Optional[datetime] = field(default=None)
 
     @property
     def is_enrolled(self: _S) -> bool:
         """在籍有無"""
         return (self.join_date is not None) and (self.retirement_date is None)
 
-    def join(
-        self: _S, account: str, mail_address: str, date: Optional[datetime.date]
-    ) -> _S:
+    def join(self: _S, account: str, mail_address: str, date: Optional[datetime]) -> _S:
         """入社する"""
         return self._update(
             account=account,
@@ -39,7 +37,7 @@ class Employee(domain.Entity):
             join_date=date if date is not None else datetime.now().date,
         )
 
-    def retire(self: _S, date: Optional[datetime.date]) -> _S:
+    def retire(self: _S, date: Optional[datetime]) -> _S:
         """退職する"""
         return self._update(
             retirement_date=date if date is not None else datetime.now().date
@@ -55,16 +53,12 @@ class Employee(domain.Entity):
 
 
 class Repository(ABC):
-    """Repository"""
-
     @staticmethod
     @abstractmethod
-    async def get(id_: domain.Id) -> Awaitable[Optional[Employee]]:
-        """get"""
+    async def get(id_: domain.Id) -> Optional[Employee]:
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    async def save(entity: Employee) -> Awaitable[Employee]:
-        """save"""
+    async def save(entity: Employee) -> Employee:
         raise NotImplementedError

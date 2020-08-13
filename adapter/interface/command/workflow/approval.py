@@ -1,4 +1,4 @@
-from typing import Awaitable, Optional
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -7,8 +7,8 @@ import domain
 from adapter import interface
 from domain import application, employee, governance, workflow
 from dsl.type import ImmutableSequence
-from usecase import workflow_usecase_test
-from usecase.workflow_usecase import WorkflowUsecase
+from command import workflow_command_test
+from command.workflow_command import WorkflowCommand
 
 router = APIRouter()
 
@@ -21,9 +21,7 @@ class EmployeeRepositoryMock(employee.Repository):
             account="test_employee",
             name="test_employee",
             mail_address="test_mail_address",
-            duties=ImmutableSequence(
-                [governance.Duties.MANAGEMENT_DEPARTMENT]
-            ),
+            duties=ImmutableSequence([governance.Duties.MANAGEMENT_DEPARTMENT]),
             join_date=None,
             retirement_date=None,
         )
@@ -35,7 +33,7 @@ class EmployeeRepositoryMock(employee.Repository):
 
 class ApplicationRepositoryMock(application.Repository):
     @staticmethod
-    async def get(id: int) -> Awaitable[Optional[application.Application]]:
+    async def get(id: int) -> Optional[application.Application]:
         return application.Application(
             id=1,
             applicant_id=1,
@@ -44,9 +42,7 @@ class ApplicationRepositoryMock(application.Repository):
         )
 
     @staticmethod
-    async def save(
-        entity: application.Application,
-    ) -> Awaitable[application.Application]:
+    async def save(entity: application.Application,) -> application.Application:
         return entity
 
 
@@ -64,7 +60,8 @@ class WorkflowRepositoryMock(workflow.Repository):
     async def save(entity: workflow.Workflow) -> workflow.Workflow:
         return entity
 
-usecase = WorkflowUsecase(
+
+command = WorkflowCommand(
     employee_repository=EmployeeRepositoryMock,
     application_repository=ApplicationRepositoryMock,
     workflow_repository=WorkflowRepositoryMock,
@@ -72,26 +69,24 @@ usecase = WorkflowUsecase(
 
 
 class Request(BaseModel):
-    actor_id: int = 0 
-    application_id: int  = 0 
-    comment: str = ''
-
+    actor_id: int = 0
+    application_id: int = 0
+    comment: str = ""
 
 
 @router.put(
     path="/commands/approval",
     tags=["command"],
-    #response_model=application.Application, 
+    # response_model=application.Application,
     status_code=200,
-    summary=usecase.approval.__doc__,
-    description=interface.test_specification(module=workflow_usecase_test),
+    summary=command.approval.__doc__,
+    description=interface.test_specification(module=workflow_command_test),
     responses={
-        403: { "message": "NoJobAuthorityError" },
-        410: { "message": "AlreadySottleError" },
+        403: {"message": "NoJobAuthorityError"},
+        410: {"message": "AlreadySottleError"},
     },
 )
 async def approval(request: Request):
-
     def error_handling(error: application.Error):
         if application.NoJobAuthorityError is type(error):
             raise HTTPException(status_code=403, detail=error.message)
@@ -104,12 +99,12 @@ async def approval(request: Request):
         else:
             raise HTTPException(status_code=500)
 
-    result = await usecase.approval(
+    result = await command.approval(
         actor_id=request.actor_id,
         application_id=request.application_id,
-        comment=request.comment
+        comment=request.comment,
     )
     return result.fold(
-        err=lambda error: error_handling(error=error), 
-        ok=lambda result: result.as_dict()
+        err=lambda error: error_handling(error=error),
+        ok=lambda result: result.as_dict(),
     )

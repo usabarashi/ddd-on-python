@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Awaitable, Iterable, Optional, TypeVar
+from typing import List, Optional, TypeVar
 from enum import Enum
 from datetime import datetime as _datetime
-from dataclasses import field
+from dataclasses import dataclass, field
 
 import domain
 from domain import employee, workflow
@@ -16,7 +16,7 @@ class Judgment(Enum):
     REJECTED = 1
 
 
-@domain.value
+@dataclass(eq=False, frozen=True)
 class Progress:
     """進捗"""
 
@@ -29,24 +29,32 @@ class Progress:
 class Route(ImmutableSequence[Progress]):
     """承認経路"""
 
-    def __init__(self, iterable: Iterable[Progress] = list()):
-        ImmutableSequence.__init__(self, iterable)
+    def __init__(self, sequence: List[Progress] = list()):
+        ImmutableSequence.__init__(self, sequence)
 
     def is_complete(self) -> bool:
         """決済の有無"""
-        return self.map(function=lambda process: process is Judgment.APPROVED).reduce(
-            function=lambda left, right: left and right
-        )
+        return self.map(
+            function=lambda progress: progress.approve is Judgment.APPROVED
+        ).reduce(function=lambda left, right: left and right)
 
     def has_approver(self, approver: employee.Employee) -> bool:
         """承認者に含まれているか否か"""
-        return self.filter(function=lambda process: process.approver_id == approver.id)
+        return (
+            0
+            < self.filter(
+                function=lambda process: process.approver_id == approver.id_
+            ).size()
+        )
 
     def has_process(self, approver: employee.Employee) -> bool:
         """承認済みか否か"""
-        return self.filter(
-            function=lambda process: process.approver_id == approver.id
-            and process.datetime is not None
+        return (
+            0
+            < self.filter(
+                function=lambda process: process.approver_id == approver.id
+                and process.datetime is not None
+            ).size()
         )
 
     def progress_approve(self, approver: employee.Employee, comment: str):
@@ -54,8 +62,8 @@ class Route(ImmutableSequence[Progress]):
         return Route(
             self.map(
                 function=lambda progress: Progress(
-                    approver_id=approver.id,
-                    approve=True,
+                    approver_id=approver.id if approver.id else 0,  # FIXME: Type Puzzle
+                    approve=Judgment.APPROVED,
                     datetime=_datetime.now(),
                     comment=comment,
                 )
@@ -65,9 +73,9 @@ class Route(ImmutableSequence[Progress]):
         )
 
 
-@domain.entity
+@dataclass(eq=False, frozen=True)
 class Application(domain.Entity):
-    id: Optional[domain.Id] = field(default_factory=None)
+    id_: Optional[domain.Id] = field(default=None)
     applicant_id: domain.Id = 0
     workflow_id: domain.Id = 0
     route: Route = field(default_factory=Route)
@@ -80,16 +88,14 @@ class Application(domain.Entity):
 
 
 class Repository(ABC):
-    """リポジトリ"""
-
     @staticmethod
     @abstractmethod
-    async def get(id: domain.Id) -> Awaitable[Optional[Application]]:
+    async def get(id_: domain.Id) -> Optional[Application]:
         raise NotImplementedError
 
     @staticmethod
     @abstractmethod
-    async def save(entity: Application) -> Awaitable[Application]:
+    async def save(entity: Application) -> Application:
         raise NotImplementedError
 
 
@@ -123,13 +129,13 @@ class AlreayApproveError(Error):
     pass
 
 
-@domain.entity
+@dataclass(eq=False, frozen=True)
 class ApproverRole(employee.Employee):
     """承認者ロール"""
 
-    def has_process(self, application: Application):
+    def has_process(self, application: Application, workflow: workflow.Workflow):
         """処理の有無"""
-        if application.duties not in self.duties:
+        if workflow.duties not in self.duties:
             return False
         if application.route.is_complete:
             return False
@@ -141,7 +147,7 @@ class ApproverRole(employee.Employee):
 
     def approval(
         self: _S, application: Application, workflow: workflow.Workflow, comment: str
-    ) -> Result[domain.Error, Application]:
+    ) -> Result[Error, Application]:
         """承認する"""
         if workflow.duties not in self.duties:
             return Err(NoJobAuthorityError("職務権限がありません."))
@@ -156,4 +162,3 @@ class ApproverRole(employee.Employee):
             return Err(AlreayApproveError("承認済みです."))
 
         return Ok(application.process(approver=self, comment=comment))
-

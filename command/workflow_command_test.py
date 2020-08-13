@@ -1,11 +1,10 @@
 import asyncio
-import pytest
-from typing import Awaitable, Optional
+from typing import Optional
 
 import domain
+from command import workflow_command
 from domain import application, employee, governance, workflow
-from dsl.type import Err, Ok, Result, ImmutableSequence
-from usecase import workflow_usecase
+from dsl.type import Err, Ok, ImmutableSequence
 
 
 class Test承認:
@@ -21,9 +20,9 @@ class Test承認:
 
             class EmployeeRepositoryMock(employee.Repository):
                 @staticmethod
-                async def get(id: int) -> Optional[employee.Employee]:
+                async def get(id_: int) -> Optional[employee.Employee]:
                     return employee.Employee(
-                        id=1,
+                        id_=1,
                         account="test_employee",
                         name="test_employee",
                         mail_address="test_mail_address",
@@ -40,9 +39,9 @@ class Test承認:
 
             class ApplicationRepositoryMock(application.Repository):
                 @staticmethod
-                async def get(id: int) -> Awaitable[Optional[application.Application]]:
+                async def get(id_: int) -> Optional[application.Application]:
                     return application.Application(
-                        id=1,
+                        id_=1,
                         applicant_id=1,
                         workflow_id=1,
                         route=application.Route([application.Progress(approver_id=1)]),
@@ -51,14 +50,14 @@ class Test承認:
                 @staticmethod
                 async def save(
                     entity: application.Application,
-                ) -> Awaitable[application.Application]:
+                ) -> application.Application:
                     return entity
 
             class WorkflowRepositoryMock(workflow.Repository):
                 @staticmethod
-                async def get(id: domain.Id) -> Optional[workflow.Workflow]:
+                async def get(id_: domain.Id) -> Optional[workflow.Workflow]:
                     return workflow.Workflow(
-                        id=1,
+                        id_=1,
                         name="test",
                         description="test",
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -68,14 +67,14 @@ class Test承認:
                 async def save(entity: workflow.Workflow) -> workflow.Workflow:
                     return entity
 
-            usecase = workflow_usecase.WorkflowUsecase(
+            command = workflow_command.WorkflowCommand(
                 employee_repository=EmployeeRepositoryMock,
                 application_repository=ApplicationRepositoryMock,
                 workflow_repository=WorkflowRepositoryMock,
             )
 
             result = asyncio.run(
-                usecase.approval(actor_id=1, application_id=1, comment="test")
+                command.approval(actor_id=1, application_id=1, comment="test")
             )
             assert Ok is type(result)
 
@@ -84,7 +83,7 @@ class Test承認:
         def test_承認者が対象申請の管掌権限を持っていない場合はエラーとする():
             class EmployeeRepositoryMock(employee.Repository):
                 @staticmethod
-                async def get(id: int) -> Optional[employee.Employee]:
+                async def get(id_: int) -> Optional[employee.Employee]:
                     return employee.Employee(
                         id=1,
                         account="test_employee",
@@ -101,20 +100,20 @@ class Test承認:
 
             class ApplicationRepositoryMock(application.Repository):
                 @staticmethod
-                async def get(id: int) -> Awaitable[Optional[application.Application]]:
-                    return application.Application(id=1, applicant_id=1,)
+                async def get(id_: int) -> Optional[application.Application]:
+                    return application.Application(id_=1, applicant_id=1,)
 
                 @staticmethod
                 async def save(
                     entity: application.Application,
-                ) -> Awaitable[application.Application]:
+                ) -> application.Application:
                     return entity
 
             class WorkflowRepositoryMock(workflow.Repository):
                 @staticmethod
-                async def get(id: domain.Id) -> Optional[workflow.Workflow]:
+                async def get(id_: domain.Id) -> Optional[workflow.Workflow]:
                     return workflow.Workflow(
-                        id=1,
+                        id_=1,
                         name="test",
                         description="test",
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -124,14 +123,14 @@ class Test承認:
                 async def save(entity: workflow.Workflow) -> workflow.Workflow:
                     return entity
 
-            usecase = workflow_usecase.WorkflowUsecase(
+            command = workflow_command.WorkflowCommand(
                 employee_repository=EmployeeRepositoryMock,
                 application_repository=ApplicationRepositoryMock,
                 workflow_repository=WorkflowRepositoryMock,
             )
 
             result = asyncio.run(
-                usecase.approval(actor_id=1, application_id=1, comment="test")
+                command.approval(actor_id=1, application_id=1, comment="test")
             )
             assert Err is type(result)
-            assert application.NoJobAuthorityError is type(result.value)
+            assert isinstance(result.value, application.NoJobAuthorityError)

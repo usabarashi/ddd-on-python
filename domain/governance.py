@@ -1,13 +1,12 @@
+from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime
-from typing import Generic, TypeVar
+from typing import TypeVar
 
-import domain
-
-_T = TypeVar('_T')
+_T = TypeVar("_T")
 
 
-@domain.value
+@dataclass(eq=False, frozen=True)
 class BussinessDateTime(datetime):
     class WeekDay(Enum):
         MON = 0
@@ -18,11 +17,11 @@ class BussinessDateTime(datetime):
         SAT = 5
         SUN = 6
 
-    def __init__(self, value):
-        datetime.__init__(self, value)
+    def __init__(self):
+        datetime.__init__(self)
 
     @property
-    def fiscal_year(self) -> datetime.year:
+    def fiscal_year(self) -> int:
         """会計年度"""
         raise NotImplementedError
 
@@ -41,6 +40,7 @@ class BussinessDateTime(datetime):
 
 class Duties(Enum):
     """業務分掌"""
+
     MANAGEMENT_DEPARTMENT = 0
     PLANNING_DEPARTMENT = 1
     MANUFACTURING_DEPARTMENT = 2
