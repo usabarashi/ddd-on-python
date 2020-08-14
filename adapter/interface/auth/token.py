@@ -4,8 +4,8 @@
 
 from typing import List
 
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from adapter.auth import auth
 from adapter.auth.token_dao import Token, TokenDAO
@@ -14,20 +14,15 @@ from dsl.type import Err
 router = APIRouter()
 
 
-class Request(BaseModel):
-    username: str = ""
-    password: str = ""
-
-
 @router.post(
     path="/auth/token",
     tags=["auth"],
     response_model=Token,
     status_code=200,
     summary="",
-    description="Sample: johndoe:password",
+    description="Sample: johndoe/password",
 )
-async def create_token(request: Request) -> Token:
+async def create_token(request: OAuth2PasswordRequestForm = Depends()) -> Token:
 
     auth_result = await auth.authenticate(
         username=request.username, password=request.password
