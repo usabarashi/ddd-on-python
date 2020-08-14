@@ -38,5 +38,4 @@ class TokenRepository:
     async def save(entity: Token) -> Token:
         global _fake_token_db
         _fake_token_db.append(entity)
-        assert 0 < len(_fake_token_db)
         return entity
