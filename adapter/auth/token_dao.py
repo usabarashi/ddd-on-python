@@ -2,9 +2,7 @@
 """トークンDAO
 """
 
-from dataclasses import asdict
 from typing import List, Optional
-
 
 from pydantic import BaseModel
 
@@ -17,7 +15,7 @@ class Token(BaseModel):
 _fake_token_db: List[Token] = []
 
 
-class TokenRepository:
+class TokenDAO:
     @staticmethod
     async def get(access_token: str) -> Optional[Token]:
         global _fake_token_db

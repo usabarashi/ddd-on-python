@@ -48,7 +48,7 @@ $ pytest domain/ command/
 
 ## Reference
 
-- [docker-composel](https://github.com/usabarashi/ddd-on-python-composer)
+- [docker-compose](https://github.com/usabarashi/ddd-on-python-composer)
 - [Developing inside a Container](https://code.visualstudio.com/docs/remote/containers)
 - [docker](https://www.docker.com/)
 - [FastAPI](https://fastapi.tiangolo.com/)
