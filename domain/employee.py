@@ -14,7 +14,7 @@ _S = TypeVar("_S")
 class Employee(domain.Entity):
     """社員"""
 
-    id: Optional[domain.Id] = field(default=None)
+    id_: Optional[domain.Id] = field(default=None)
     account: str = ""
     name: str = ""
     mail_address: str = ""

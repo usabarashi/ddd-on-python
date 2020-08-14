@@ -6,7 +6,7 @@ from pydantic import BaseModel
 import domain
 from adapter import interface
 from domain import application, employee, governance, workflow
-from dsl.type import ImmutableSequence
+from dsl.type import Err, ImmutableSequence
 from command import workflow_command_test
 from command.workflow_command import WorkflowCommand
 
@@ -15,9 +15,9 @@ router = APIRouter()
 
 class EmployeeRepositoryMock(employee.Repository):
     @staticmethod
-    async def get(id: int) -> Optional[employee.Employee]:
+    async def get(id_: int) -> Optional[employee.Employee]:
         return employee.Employee(
-            id=1,
+            id_=1,
             account="test_employee",
             name="test_employee",
             mail_address="test_mail_address",
@@ -33,9 +33,9 @@ class EmployeeRepositoryMock(employee.Repository):
 
 class ApplicationRepositoryMock(application.Repository):
     @staticmethod
-    async def get(id: int) -> Optional[application.Application]:
+    async def get(id_: int) -> Optional[application.Application]:
         return application.Application(
-            id=1,
+            id_=1,
             applicant_id=1,
             workflow_id=1,
             route=application.Route([application.Progress(approver_id=1)]),
@@ -48,9 +48,9 @@ class ApplicationRepositoryMock(application.Repository):
 
 class WorkflowRepositoryMock(workflow.Repository):
     @staticmethod
-    async def get(id: domain.Id) -> Optional[workflow.Workflow]:
+    async def get(id_: domain.Id) -> Optional[workflow.Workflow]:
         return workflow.Workflow(
-            id=1,
+            id_=1,
             name="test",
             description="test",
             duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -86,25 +86,25 @@ class Request(BaseModel):
         410: {"message": "AlreadySottleError"},
     },
 )
-async def approval(request: Request):
+async def approval(request: Request) -> dict:
     def error_handling(error: application.Error):
         if application.NoJobAuthorityError is type(error):
-            raise HTTPException(status_code=403, detail=error.message)
-        elif application.AlreadySottleError is type(error):
-            raise HTTPException(status_code=410, detail=error.message)
-        elif application.NotAnApproverError is type(error):
-            raise HTTPException(status_code=403, detail=error.message)
-        elif application.AlreayApproveError is type(error):
-            raise HTTPException(status_code=403, detail=error.message)
-        else:
-            raise HTTPException(status_code=500)
+            raise HTTPException(status_code=403, detail=error)
+        if application.AlreadySottleError is type(error):
+            raise HTTPException(status_code=410, detail=error)
+        if application.NotAnApproverError is type(error):
+            raise HTTPException(status_code=403, detail=error)
+        if application.AlreayApproveError is type(error):
+            raise HTTPException(status_code=403, detail=error)
+        raise HTTPException(status_code=500)
 
     result = await command.approval(
         actor_id=request.actor_id,
         application_id=request.application_id,
         comment=request.comment,
     )
-    return result.fold(
-        err=lambda error: error_handling(error=error),
-        ok=lambda result: result.as_dict(),
-    )
+    if isinstance(result, Err):
+        error_handling(error=result.value)
+    else:
+        assert result.value.as_dict()
+        return result.value.as_dict()

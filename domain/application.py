@@ -52,24 +52,22 @@ class Route(ImmutableSequence[Progress]):
         return (
             0
             < self.filter(
-                function=lambda process: process.approver_id == approver.id
+                function=lambda process: process.approver_id == approver.id_
                 and process.datetime is not None
             ).size()
         )
 
-    def progress_approve(self, approver: employee.Employee, comment: str):
+    def progress_approve(self: _S, approver: employee.Employee, comment: str) -> _S:
         """承認を追加する"""
-        return Route(
-            self.map(
-                function=lambda progress: Progress(
-                    approver_id=approver.id if approver.id else 0,  # FIXME: Type Puzzle
-                    approve=Judgment.APPROVED,
-                    datetime=_datetime.now(),
-                    comment=comment,
-                )
-                if progress.approver_id == approver.id
-                else progress
+        return self.map(
+            function=lambda progress: Progress(
+                approver_id=approver.id_ if approver.id_ else 0,  # FIXME Type Puzzle
+                approve=Judgment.APPROVED,
+                datetime=_datetime.now(),
+                comment=comment,
             )
+            if progress.approver_id == approver.id_
+            else progress
         )
 
 
