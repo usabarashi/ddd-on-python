@@ -16,6 +16,7 @@ pytest = "5.4.3"
 passlib = {extras = ["bcrypt"], version = "*"}
 python-jose = {extras = ["cryptography"], version = "*"}
 python-multipart = "*"
+umongo = {extras = ["motor"], version = "*"}
 
 [requires]
 python_version = "3.8"
