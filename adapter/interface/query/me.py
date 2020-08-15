@@ -8,8 +8,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from pydantic.dataclasses import dataclass
 
-from adapter.auth import auth
-from adapter.auth.account_dao import Account
+from adapter.infrastructure.auth import auth
+from adapter.infrastructure.auth.account_dao import Account
 
 router = APIRouter()
 

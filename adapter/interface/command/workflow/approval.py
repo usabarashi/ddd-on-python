@@ -1,10 +1,13 @@
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from pydantic.dataclasses import dataclass
 
 import domain
 from adapter import interface
+from adapter.infrastructure.auth import auth
+from adapter.infrastructure.auth.account_dao import Account
 from domain import application, employee, governance, workflow
 from dsl.type import Err, ImmutableSequence
 from command import workflow_command_test
@@ -74,6 +77,11 @@ class Request(BaseModel):
     comment: str = ""
 
 
+@dataclass(eq=False, frozen=True)
+class ResponseApplication(BaseModel, application.Application):
+    pass
+
+
 @router.put(
     path="/commands/approval",
     tags=["command"],
@@ -86,7 +94,9 @@ class Request(BaseModel):
         410: {"message": "AlreadySottleError"},
     },
 )
-async def approval(request: Request) -> dict:
+async def approval(
+    request: Request, actor_account: Account = Depends(auth.get_account)
+) -> ResponseApplication:
     def error_handling(error: application.Error):
         if application.NoJobAuthorityError is type(error):
             raise HTTPException(status_code=403, detail=error)
@@ -106,5 +116,4 @@ async def approval(request: Request) -> dict:
     if isinstance(result, Err):
         error_handling(error=result.value)
     else:
-        assert result.value.as_dict()
-        return result.value.as_dict()
+        return ResponseApplication(**result.value.as_dict())

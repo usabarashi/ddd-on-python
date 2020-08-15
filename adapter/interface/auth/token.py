@@ -7,8 +7,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-from adapter.auth import auth
-from adapter.auth.token_dao import Token, TokenDAO
+from adapter.infrastructure.auth import auth
+from adapter.infrastructure.auth.token_dao import Token, TokenDAO
 from dsl.type import Err
 
 router = APIRouter()

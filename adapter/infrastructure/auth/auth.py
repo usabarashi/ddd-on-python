@@ -12,8 +12,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from adapter.auth.account_dao import Account, AccountDAO
-from adapter.auth.token_dao import Token, TokenDAO
+from adapter.infrastructure.auth.account_dao import Account, AccountDAO
+from adapter.infrastructure.auth.token_dao import Token, TokenDAO
 from dsl.type import Err, Ok, Result
 
 # to get a string like this run:
