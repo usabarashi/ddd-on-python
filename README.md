@@ -9,11 +9,10 @@ Trial and error of DDD on Python.
 
 ```
 $ code ./ 
-$ pipenv shell
-$ pyreverse -o png --ignore=__init___test.py domain/
+$ pipenv run update_model 
 ```
 
-## Set up 
+## Setting up a development environment 
 
 1. [Build the container in advance.](https://github.com/usabarashi/ddd-on-python-composer)
 1. [Editing the path of docker-compose.](https://github.com/usabarashi/ddd-on-python/blob/master/.devcontainer/devcontainer.json)
@@ -21,17 +20,15 @@ $ pyreverse -o png --ignore=__init___test.py domain/
 
 ```
 $ code ./ 
-$ export PIPENV_VENV_IN_PROJECT=1
-$ pipenv --python 3.8 
 $ pipenv install
+$ pipenv install --dev
 ```
 
 ## Run
 
 ```
 $ code ./ 
-$ pipenv shell
-$ python main.py 
+$ pipenv run start 
 ```
 
 ## Open API
@@ -42,8 +39,7 @@ $ python main.py
 
 ```
 $ code ./ 
-$ pipenv shell
-$ pytest domain/ command/
+$ pipenv run test 
 ```
 
 ## Reference
