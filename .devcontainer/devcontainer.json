@@ -8,6 +8,9 @@
 	"service": "backend",
 	"workspaceFolder": "/opt/ddd-on-python",
 	// Set *default* container specific settings.json values on container create.
+	"remoteEnv": {
+		"PYTHONPATH": "/opt/ddd-on-python",
+	},
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.pythonPath": "/opt/ddd-on-python/.venv/bin/python",
@@ -30,7 +33,9 @@
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
-		"ms-python.python"
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-pyright.pyright"
 	]
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
