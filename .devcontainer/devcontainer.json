@@ -10,13 +10,18 @@
 	// Set *default* container specific settings.json values on container create.
 	"remoteEnv": {
 		"PYTHONPATH": "/opt/ddd-on-python",
+		"PIPENV_VENV_IN_PROJECT": "1",
 	},
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.pythonPath": "/opt/ddd-on-python/.venv/bin/python",
+		"python.analysis.typeCheckingMode": "basic",
 		"python.linting.enabled": true,
+		"python.linting.lintOnSave": true,
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
+		"python.formatting.provider": "autopep8",
+		"editor.formatOnSave": true,
 		"python.formatting.autopep8Path": "/opt/ddd-on-python/.venv/bin/autopep8",
 		"python.formatting.blackPath": "/opt/ddd-on-python/.venv/bin/black",
 		"python.formatting.yapfPath": "/opt/ddd-on-python/.venv/bin/yapf",
@@ -35,7 +40,6 @@
 	"extensions": [
 		"ms-python.python",
 		"ms-python.vscode-pylance",
-		"ms-pyright.pyright"
 	]
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
