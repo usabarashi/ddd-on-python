@@ -12,18 +12,19 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
+from adapter import config
 from adapter.infrastructure.auth.account_dao import Account, AccountDAO
 from adapter.infrastructure.auth.token_dao import Token, TokenDAO
 from dsl.type import Err, Ok, Result
 
 # to get a string like this run:
 # openssl rand -hex 32
-TOKEN_URL = "/auth/token"
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+CREATE_TOKEN_ENDPOINT: str = config["adapter"]["infrastructure"]["auth"]["CREATE_TOKEN_ENDPOINT"]
+SECRET_KEY: str = config["adapter"]["infrastructure"]["auth"]["SECRET_KEY"]
+ALGORITHM: str = config["adapter"]["infrastructure"]["auth"]["ALGORITHM"]
+EXPIRE_MINUTES: int = config["adapter"]["infrastructure"]["auth"]["EXPIRE_MINUTES"]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=TOKEN_URL)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=CREATE_TOKEN_ENDPOINT)
 
 
 async def authenticate(username: str, password: str) -> Result[Literal[False], Account]:
@@ -46,7 +47,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 async def create_token(
     key: str,
-    expires_delta: Optional[timedelta] = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+    expires_delta: Optional[timedelta] = timedelta(minutes=EXPIRE_MINUTES),
 ) -> Token:
     """トークン生成
     """
@@ -84,7 +85,7 @@ async def get_account(token: str = Depends(oauth2_scheme)) -> Account:
     # Decode jwt
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        username = payload.get("sub")
         if username is None:
             raise credentials_exception
     except JWTError:

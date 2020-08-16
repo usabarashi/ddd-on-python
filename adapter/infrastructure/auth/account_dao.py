@@ -34,4 +34,3 @@ class AccountDAO:
             return None
         else:
             return Account(**_fake_account_db[username])
-

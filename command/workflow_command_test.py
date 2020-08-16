@@ -44,7 +44,8 @@ class Test承認:
                         id_=1,
                         applicant_id=1,
                         workflow_id=1,
-                        route=application.Route([application.Progress(approver_id=1)]),
+                        route=application.Route(
+                            [application.Progress(approver_id=1)]),
                     )
 
                 @staticmethod
@@ -85,7 +86,7 @@ class Test承認:
                 @staticmethod
                 async def get(id_: int) -> Optional[employee.Employee]:
                     return employee.Employee(
-                        id=1,
+                        id_=1,
                         account="test_employee",
                         name="test_employee",
                         mail_address="test_mail_address",
