@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Me
 """
 
@@ -8,14 +7,13 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from pydantic.dataclasses import dataclass
 
-from adapter.infrastructure.auth import auth
-from adapter.infrastructure.auth.account_dao import Account
+from adapter.infrastructure.auth import account, auth
 
 router = APIRouter()
 
 
-@dataclass(eq=False, frozen=True)
-class ResponseAccount(BaseModel, Account):
+@dataclass(frozen=True)
+class ResponseAccount(BaseModel, account.Account):
     pass
 
 
@@ -28,6 +26,6 @@ class ResponseAccount(BaseModel, Account):
     description="",
 )
 async def get_account(
-    actor_account: Account = Depends(auth.get_account),
+    actor_account: account.Account = Depends(auth.get_account),
 ) -> ResponseAccount:
     return ResponseAccount(**asdict(actor_account))

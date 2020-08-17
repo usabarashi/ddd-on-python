@@ -8,7 +8,6 @@ import adapter.interface.command.workflow.approval
 import adapter.interface.query.application
 import adapter.interface.query.me
 
-
 app = FastAPI(title=config["adapter"]["interface"]["APPLICATION_NAME"])
 app.include_router(router=adapter.interface.auth.token.router)
 app.include_router(router=adapter.interface.command.workflow.approval.router)
@@ -20,4 +19,6 @@ if __name__ == "__main__":
         app,
         host=config["adapter"]["interface"]["ALLOW_HOST"],
         port=config["adapter"]["interface"]["PORT"],
+        loop="none",
+        reload=False,
     )

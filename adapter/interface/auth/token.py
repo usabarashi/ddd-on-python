@@ -1,28 +1,34 @@
-# -*- coding: utf-8 -*-
 """Auth
 """
 
+from dataclasses import asdict
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from pydantic import BaseModel
+from pydantic.dataclasses import dataclass
 
-from adapter.infrastructure.auth import auth
-from adapter.infrastructure.auth.token_dao import Token, TokenDAO
+from adapter.infrastructure.auth import auth, token
 from dsl.type import Err
 
 router = APIRouter()
 
 
+@dataclass(frozen=True)
+class ResponseToken(BaseModel, token.Token):
+    pass
+
+
 @router.post(
     path="/auth/token",
     tags=["auth"],
-    response_model=Token,
+    response_model=ResponseToken,
     status_code=200,
     summary="",
     description="Sample: johndoe/password",
 )
-async def create_token(request: OAuth2PasswordRequestForm = Depends()) -> Token:
+async def create_token(request: OAuth2PasswordRequestForm = Depends()) -> ResponseToken:
 
     auth_result = await auth.authenticate(
         username=request.username, password=request.password
@@ -34,18 +40,18 @@ async def create_token(request: OAuth2PasswordRequestForm = Depends()) -> Token:
             headers={"WWW-Authenticate": "Bearer"},
         )
     else:
-        account = auth_result.value
-        token = await auth.create_token(key=account.username, expires_delta=None)
-        return token
+        authed_account = auth_result.value
+        created_token = await auth.create_token(key=authed_account.username, expires_delta=None)
+        return ResponseToken(**asdict(created_token))
 
 
 @router.get(
     path="/auth/token",
     tags=["auth"],
-    response_model=List[Token],
+    response_model=List[ResponseToken],
     status_code=200,
     summary="",
     description="Management.",
 )
-async def find_token() -> List[Token]:
-    return await TokenDAO.find()
+async def find_token() -> List[ResponseToken]:
+    return [ResponseToken(**asdict(got_token)) async for got_token in token.find()]

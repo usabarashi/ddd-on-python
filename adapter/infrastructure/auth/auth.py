@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Auth
 
 see: https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
@@ -13,8 +12,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from adapter import config
-from adapter.infrastructure.auth.account_dao import Account, AccountDAO
-from adapter.infrastructure.auth.token_dao import Token, TokenDAO
+from adapter.infrastructure.auth import account, token
 from dsl.type import Err, Ok, Result
 
 # to get a string like this run:
@@ -27,16 +25,16 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=CREATE_TOKEN_ENDPOINT)
 
 
-async def authenticate(username: str, password: str) -> Result[Literal[False], Account]:
+async def authenticate(username: str, password: str) -> Result[Literal[False], account.Account]:
     """認証
     """
-    account = await AccountDAO.get(username=username)
-    if not account or not verify_password(
-        plain_password=password, hashed_password=account.hashed_password
+    got_account = await account.get(username=username)
+    if got_account is None or not verify_password(
+        plain_password=password, hashed_password=got_account.hashed_password
     ):
         return Err(value=False)
     else:
-        return Ok(value=account)
+        return Ok(value=got_account)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -48,7 +46,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 async def create_token(
     key: str,
     expires_delta: Optional[timedelta] = timedelta(minutes=EXPIRE_MINUTES),
-) -> Token:
+) -> token.Token:
     """トークン生成
     """
     to_encode: Dict[str, Any] = {"sub": key}.copy()
@@ -58,11 +56,11 @@ async def create_token(
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
 
-    created_token = Token(
+    created_token = token.Token(
         access_token=jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM),
         token_type="bearer",
     )
-    saved_token = await TokenDAO.save(entity=created_token)
+    saved_token = await token.save(entity=created_token)
     return saved_token
 
 
@@ -72,7 +70,7 @@ def to_hash(string: str) -> str:
     return pwd_context.hash(string)
 
 
-async def get_account(token: str = Depends(oauth2_scheme)) -> Account:
+async def get_account(token: str = Depends(oauth2_scheme)) -> account.Account:
     """アカウント取得
     """
 
@@ -91,11 +89,9 @@ async def get_account(token: str = Depends(oauth2_scheme)) -> Account:
     except JWTError:
         raise credentials_exception
 
-    # Get account
-    account = await AccountDAO.get(username=username)
-    if account is None:
+    # Get active account
+    got_active_account = await account.get(username=username)
+    if got_active_account is None:
         raise credentials_exception
-    if account.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
 
-    return account
+    return got_active_account

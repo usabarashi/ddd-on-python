@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from functools import reduce
 from typing import Generic, TypeVar
 
@@ -8,7 +9,7 @@ from dsl.type import Err, ImmutableSequence, Ok, Result
 _T = TypeVar("_T")
 
 
-@domain.entity
+@dataclass(eq=False, frozen=True)
 class Confidential(Generic[_T]):
     """機密"""
 

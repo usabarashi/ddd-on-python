@@ -81,7 +81,8 @@ class Application(domain.Entity):
     def process(self: _S, approver: employee.Employee, comment: str) -> _S:
         """処理する"""
         return self._update(
-            route=self.route.progress_approve(approver=approver, comment=comment)
+            route=self.route.progress_approve(
+                approver=approver, comment=comment)
         )
 
 
@@ -100,31 +101,21 @@ class Repository(ABC):
 class Error(domain.Error):
     """申請エラー"""
 
-    pass
-
 
 class NoJobAuthorityError(Error):
     """職務権限なしエラー"""
-
-    pass
 
 
 class AlreadySottleError(Error):
     """決済済エラー"""
 
-    pass
-
 
 class NotAnApproverError(Error):
     """承認経路に含まれていないエラー"""
 
-    pass
-
 
 class AlreayApproveError(Error):
     """承認済みエラー"""
-
-    pass
 
 
 @dataclass(eq=False, frozen=True)
@@ -149,13 +140,10 @@ class ApproverRole(employee.Employee):
         """承認する"""
         if workflow.duties not in self.duties:
             return Err(NoJobAuthorityError("職務権限がありません."))
-
         if application.route.is_complete():
             return Err(AlreadySottleError("決裁済みです."))
-
         if not application.route.has_approver(approver=self):
             return Err(NotAnApproverError("承認経路に含まれていません."))
-
         if application.route.has_process(approver=self):
             return Err(AlreayApproveError("承認済みです."))
 

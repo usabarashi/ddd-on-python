@@ -6,7 +6,7 @@ adapter:
             ALGORITHM: "HS256"
             EXPIRE_MINUTES: 30
         mongo:
-            URI: "mongodb://root:pasword@datastore:27017"
+            URI: "mongodb://root:password@datastore:27017"
     interface:
         APPLICATION_NAME: "DDD on Python"
         ALLOW_HOST: "0.0.0.0"

@@ -6,8 +6,7 @@ from pydantic.dataclasses import dataclass
 
 import domain
 from adapter import interface
-from adapter.infrastructure.auth import auth
-from adapter.infrastructure.auth.account_dao import Account
+from adapter.infrastructure.auth import account, auth
 from domain import application, employee, governance, workflow
 from dsl.type import Err, ImmutableSequence
 from command import workflow_command_test
@@ -24,7 +23,8 @@ class EmployeeRepositoryMock(employee.Repository):
             account="test_employee",
             name="test_employee",
             mail_address="test_mail_address",
-            duties=ImmutableSequence([governance.Duties.MANAGEMENT_DEPARTMENT]),
+            duties=ImmutableSequence(
+                [governance.Duties.MANAGEMENT_DEPARTMENT]),
             join_date=None,
             retirement_date=None,
         )
@@ -95,7 +95,7 @@ class ResponseApplication(BaseModel, application.Application):
     },
 )
 async def approval(
-    request: Request, actor_account: Account = Depends(auth.get_account)
+    request: Request, actor_account: account.Account = Depends(auth.get_account)
 ) -> ResponseApplication:
     def error_handling(error: application.Error):
         if application.NoJobAuthorityError is type(error):
