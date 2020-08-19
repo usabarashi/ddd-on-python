@@ -19,6 +19,5 @@ if __name__ == "__main__":
         app,
         host=config["adapter"]["interface"]["ALLOW_HOST"],
         port=config["adapter"]["interface"]["PORT"],
-        loop="none",
         reload=False,
     )

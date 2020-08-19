@@ -5,7 +5,7 @@ from datetime import datetime as _datetime
 from dataclasses import dataclass, field
 
 import domain
-from domain import employee, workflow
+from domain import entity, employee, workflow
 from dsl.type import ImmutableSequence, Err, Ok, Result
 
 _S = TypeVar("_S")
@@ -20,7 +20,7 @@ class Judgment(Enum):
 class Progress:
     """進捗"""
 
-    approver_id: domain.Id = 0
+    approver_id: entity.ID
     approve: Optional[Judgment] = field(default=None)
     datetime: Optional[_datetime] = field(default=None)
     comment: Optional[str] = field(default=None)
@@ -43,7 +43,7 @@ class Route(ImmutableSequence[Progress]):
         return (
             0
             < self.filter(
-                function=lambda process: process.approver_id == approver.id_
+                function=lambda process: process.approver_id == approver.id
             ).size()
         )
 
@@ -52,7 +52,7 @@ class Route(ImmutableSequence[Progress]):
         return (
             0
             < self.filter(
-                function=lambda process: process.approver_id == approver.id_
+                function=lambda process: process.approver_id == approver.id
                 and process.datetime is not None
             ).size()
         )
@@ -61,22 +61,22 @@ class Route(ImmutableSequence[Progress]):
         """承認を追加する"""
         return self.map(
             function=lambda progress: Progress(
-                approver_id=approver.id_ if approver.id_ else 0,  # FIXME Type Puzzle
+                approver_id=approver.id,
                 approve=Judgment.APPROVED,
                 datetime=_datetime.now(),
                 comment=comment,
             )
-            if progress.approver_id == approver.id_
+            if progress.approver_id == approver.id
             else progress
         )
 
 
 @dataclass(eq=False, frozen=True)
-class Application(domain.Entity):
-    id_: Optional[domain.Id] = field(default=None)
-    applicant_id: domain.Id = 0
-    workflow_id: domain.Id = 0
+class Application(entity.Entity):
+    applicant_id: entity.ID
+    workflow_id: entity.ID
     route: Route = field(default_factory=Route)
+    id: entity.ID = field(default_factory=entity.generate_id)
 
     def process(self: _S, approver: employee.Employee, comment: str) -> _S:
         """処理する"""
@@ -89,7 +89,7 @@ class Application(domain.Entity):
 class Repository(ABC):
     @staticmethod
     @abstractmethod
-    async def get(id_: domain.Id) -> Optional[Application]:
+    async def get(id: entity.ID) -> Optional[Application]:
         raise NotImplementedError
 
     @staticmethod

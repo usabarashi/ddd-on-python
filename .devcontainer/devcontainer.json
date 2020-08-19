@@ -15,16 +15,12 @@
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.pythonPath": "/opt/ddd-on-python/.venv/bin/python",
+		// Linter
 		"python.analysis.typeCheckingMode": "basic",
 		"python.linting.enabled": true,
 		"python.linting.lintOnSave": true,
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
-		"python.formatting.provider": "autopep8",
-		"editor.formatOnSave": true,
-		"python.formatting.autopep8Path": "/opt/ddd-on-python/.venv/bin/autopep8",
-		"python.formatting.blackPath": "/opt/ddd-on-python/.venv/bin/black",
-		"python.formatting.yapfPath": "/opt/ddd-on-python/.venv/bin/yapf",
 		"python.linting.banditPath": "/opt/ddd-on-python/.venv/bin/bandit",
 		"python.linting.flake8Path": "/opt/ddd-on-python/.venv/bin/flake8",
 		"python.linting.flake8Args": [
@@ -34,7 +30,14 @@
 		"python.linting.pycodestylePath": "/opt/ddd-on-python/.venv/bin/pycodestyle",
 		"python.linting.pydocstylePath": "/opt/ddd-on-python/.venv/bin/pydocstyle",
 		"python.linting.pylintPath": "/opt/ddd-on-python/.venv/bin/pylint",
-		"python.testing.pytestPath": "/opt/ddd-on-python/.venv/bin/pytest"
+		// Formatter
+		"python.formatting.provider": "autopep8",
+		"editor.formatOnSave": true,
+		"python.formatting.autopep8Path": "/opt/ddd-on-python/.venv/bin/autopep8",
+		"python.formatting.blackPath": "/opt/ddd-on-python/.venv/bin/black",
+		"python.formatting.yapfPath": "/opt/ddd-on-python/.venv/bin/yapf",
+		// Test
+		"python.testing.pytestPath": "/opt/ddd-on-python/.venv/bin/pytest",
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [

@@ -40,8 +40,6 @@ class Error(domain.Error):
 class ConfidentialPermissionError(Error):
     """職務権限エラー"""
 
-    pass
-
 
 class ViewerRole(employee.Employee):
     """閲覧者"""

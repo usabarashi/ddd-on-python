@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 
-import domain
-from domain import application, employee, workflow
+from domain import application, entity, employee, workflow
 from dsl.type import Err, Ok, Result
 
 
@@ -11,37 +10,37 @@ class WorkflowCommand:
     application_repository: application.Repository
     workflow_repository: workflow.Repository
 
-    async def create(self, /, *, actor_id: domain.Id, workflow_id: domain.Id):
+    async def create(self, /, *, actor_id: entity.ID, workflow_id: entity.ID):
         """ワークフローを新規作成する"""
         raise NotImplementedError
 
-    async def edit(self, /, *, actor_id: domain.Id, application_id: domain.Id):
+    async def edit(self, /, *, actor_id: entity.ID, application_id: entity.ID):
         """ワークフローを編集する"""
         raise NotImplementedError
 
-    async def delete(self, /, *, actor_id: domain.Id, application_id: domain.Id):
+    async def delete(self, /, *, actor_id: entity.ID, application_id: entity.ID):
         """ワークフローを削除する"""
         raise NotImplementedError
 
-    async def apply(self, /, *, actor_id: domain.Id):
+    async def apply(self, /, *, actor_id: entity.ID):
         """申請する"""
         raise NotImplementedError
 
     async def approval(
-        self, /, *, actor_id: domain.Id, application_id: domain.Id, comment: str
+        self, /, *, actor_id: entity.ID, application_id: entity.ID, comment: str
     ) -> Result[application.Error, application.Application]:
         """申請を承認する"""
 
-        actor = await self.employee_repository.get(id_=actor_id)
+        actor = await self.employee_repository.get(id=actor_id)
         if actor is None:
             raise FileNotFoundError
 
-        approve_application = await self.application_repository.get(id_=application_id)
+        approve_application = await self.application_repository.get(id=application_id)
         if approve_application is None:
             raise FileNotFoundError
 
         approve_workflow = await self.workflow_repository.get(
-            id_=approve_application.workflow_id
+            id=approve_application.workflow_id
         )
         if approve_workflow is None:
             raise FileNotFoundError

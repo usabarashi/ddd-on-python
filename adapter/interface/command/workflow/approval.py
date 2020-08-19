@@ -1,26 +1,30 @@
+from dataclasses import dataclass
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from pydantic.dataclasses import dataclass
 
-import domain
 from adapter import interface
 from adapter.infrastructure.auth import account, auth
-from domain import application, employee, governance, workflow
+from domain import application, entity, employee, governance, workflow
 from dsl.type import Err, ImmutableSequence
 from command import workflow_command_test
 from command.workflow_command import WorkflowCommand
 
 router = APIRouter()
 
+actor_id = entity.ID("01EG39KMDMRKVV70A2FAVVGBY9")
+workflow_id = entity.ID("01EG3A4GBRDH3NZQVYZKRTQSJY")
+application_id = entity.ID("01EG39Y1C2CKC5MAYJ68SBQ381")
+applicant_id = entity.ID("01EG3A57EVTJFHTV2REY9J85M4")
+approver_id = actor_id
+
 
 class EmployeeRepositoryMock(employee.Repository):
     @staticmethod
-    async def get(id_: int) -> Optional[employee.Employee]:
+    async def get(id: int) -> Optional[employee.Employee]:
         return employee.Employee(
-            id_=1,
-            account="test_employee",
+            id=actor_id,
             name="test_employee",
             mail_address="test_mail_address",
             duties=ImmutableSequence(
@@ -36,12 +40,13 @@ class EmployeeRepositoryMock(employee.Repository):
 
 class ApplicationRepositoryMock(application.Repository):
     @staticmethod
-    async def get(id_: int) -> Optional[application.Application]:
+    async def get(id: int) -> Optional[application.Application]:
         return application.Application(
-            id_=1,
-            applicant_id=1,
-            workflow_id=1,
-            route=application.Route([application.Progress(approver_id=1)]),
+            id=application_id,
+            applicant_id=applicant_id,
+            workflow_id=workflow_id,
+            route=application.Route(
+                [application.Progress(approver_id=approver_id)]),
         )
 
     @staticmethod
@@ -51,9 +56,9 @@ class ApplicationRepositoryMock(application.Repository):
 
 class WorkflowRepositoryMock(workflow.Repository):
     @staticmethod
-    async def get(id_: domain.Id) -> Optional[workflow.Workflow]:
+    async def get(id: entity.ID) -> Optional[workflow.Workflow]:
         return workflow.Workflow(
-            id_=1,
+            id=workflow_id,
             name="test",
             description="test",
             duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -72,8 +77,8 @@ command = WorkflowCommand(
 
 
 class Request(BaseModel):
-    actor_id: int = 0
-    application_id: int = 0
+    actor_id: entity.ID = entity.generate_id()
+    application_id: entity.ID = entity.generate_id()
     comment: str = ""
 
 
@@ -83,9 +88,9 @@ class ResponseApplication(BaseModel, application.Application):
 
 
 @router.put(
-    path="/commands/approval",
+    path="/command/approval",
     tags=["command"],
-    # response_model=application.Application,
+    response_model=ResponseApplication,
     status_code=200,
     summary=command.approval.__doc__,
     description=interface.test_specification(module=workflow_command_test),
@@ -94,9 +99,8 @@ class ResponseApplication(BaseModel, application.Application):
         410: {"message": "AlreadySottleError"},
     },
 )
-async def approval(
-    request: Request, actor_account: account.Account = Depends(auth.get_account)
-) -> ResponseApplication:
+async def approval(request: Request, actor_account: account.Account = Depends(auth.get_account)):
+
     def error_handling(error: application.Error):
         if application.NoJobAuthorityError is type(error):
             raise HTTPException(status_code=403, detail=error)
@@ -109,8 +113,8 @@ async def approval(
         raise HTTPException(status_code=500)
 
     result = await command.approval(
-        actor_id=request.actor_id,
-        application_id=request.application_id,
+        actor_id=entity.ID(request.actor_id),
+        application_id=entity.ID(request.application_id),
         comment=request.comment,
     )
     if isinstance(result, Err):

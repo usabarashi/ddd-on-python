@@ -7,11 +7,6 @@ from adapter.infrastructure.auth import account
 
 
 async def browse_account(username: str) -> Optional[account.Account]:
-    """アカウント情報を参照する
+    """アカウント情報を照会する
     """
-    got_account = await account.get(username=username)
-
-    if got_account is None:
-        return None
-
-    return got_account
+    return await account.get(username=username)

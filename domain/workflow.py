@@ -4,7 +4,7 @@ from enum import Enum
 from dataclasses import dataclass, field
 
 import domain
-from domain import employee, governance
+from domain import entity, employee, governance
 from dsl.type import Err, Ok, Result
 
 
@@ -21,46 +21,38 @@ class Procedure(Enum):
 class Error(Exception):
     """ワークフローエラー"""
 
-    pass
-
 
 class NoNameError(Error):
     """名称未定義エラー"""
-
-    pass
 
 
 class NoDescriptionError(Error):
     """説明未記載エラー"""
 
-    pass
-
 
 class NoJobAuthorityError(Error):
     """承認権限エラー"""
 
-    pass
-
 
 @dataclass(eq=False, frozen=True)
-class Workflow(domain.Entity):
+class Workflow(entity.Entity):
     """ワークフロー"""
 
-    id_: Optional[domain.Id] = field(default=None)
-    name: str = ""
-    description: str = ""
+    name: str
+    description: str
     duties: governance.Duties = governance.Duties.MANAGEMENT_DEPARTMENT
+    id: entity.ID = field(default_factory=entity.generate_id)
 
     @staticmethod
-    def create_template() -> _S:
+    def create_template(name: str, description: str, duties: governance.Duties) -> _S:
         """Factory method"""
-        return Workflow()
+        return Workflow(name=name, description=description, duties=duties)
 
 
 class Repository(ABC):
     @staticmethod
     @abstractmethod
-    async def get(id_: int) -> Optional[Workflow]:
+    async def get(id: entity.ID) -> Optional[Workflow]:
         raise NotImplementedError
 
     @staticmethod

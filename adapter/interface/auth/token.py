@@ -20,6 +20,18 @@ class ResponseToken(BaseModel, token.Token):
     pass
 
 
+@router.get(
+    path="/auth/token",
+    tags=["auth"],
+    response_model=List[ResponseToken],
+    status_code=200,
+    summary="",
+    description="Management.",
+)
+async def find_token():
+    return [ResponseToken(**asdict(got_token)) async for got_token in token.find()]
+
+
 @router.post(
     path="/auth/token",
     tags=["auth"],
@@ -28,7 +40,7 @@ class ResponseToken(BaseModel, token.Token):
     summary="",
     description="Sample: johndoe/password",
 )
-async def create_token(request: OAuth2PasswordRequestForm = Depends()) -> ResponseToken:
+async def create_token(request: OAuth2PasswordRequestForm = Depends()):
 
     auth_result = await auth.authenticate(
         username=request.username, password=request.password
@@ -43,15 +55,3 @@ async def create_token(request: OAuth2PasswordRequestForm = Depends()) -> Respon
         authed_account = auth_result.value
         created_token = await auth.create_token(key=authed_account.username, expires_delta=None)
         return ResponseToken(**asdict(created_token))
-
-
-@router.get(
-    path="/auth/token",
-    tags=["auth"],
-    response_model=List[ResponseToken],
-    status_code=200,
-    summary="",
-    description="Management.",
-)
-async def find_token() -> List[ResponseToken]:
-    return [ResponseToken(**asdict(got_token)) async for got_token in token.find()]

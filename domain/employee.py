@@ -3,26 +3,24 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional, TypeVar
 
-import domain
-from domain import governance
+from domain import entity, governance
 from dsl.type import ImmutableSequence
 
 _S = TypeVar("_S")
 
 
 @dataclass(eq=False, frozen=True)
-class Employee(domain.Entity):
+class Employee(entity.Entity):
     """社員"""
 
-    id_: Optional[domain.Id] = field(default=None)
-    account: str = ""
-    name: str = ""
-    mail_address: str = ""
+    name: str
+    mail_address: str
     duties: ImmutableSequence[governance.Duties] = field(
         default_factory=ImmutableSequence
     )
     join_date: Optional[datetime] = field(default=None)
     retirement_date: Optional[datetime] = field(default=None)
+    id: entity.ID = field(default_factory=entity.generate_id)
 
     @property
     def is_enrolled(self: _S) -> bool:
@@ -55,7 +53,7 @@ class Employee(domain.Entity):
 class Repository(ABC):
     @staticmethod
     @abstractmethod
-    async def get(id_: domain.Id) -> Optional[Employee]:
+    async def get(id: entity.ID) -> Optional[Employee]:
         raise NotImplementedError
 
     @staticmethod

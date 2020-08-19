@@ -6,9 +6,10 @@ Driver:
     motor: https://docs.mongodb.com/drivers/motor
 """
 
-from adapter import config
 from motor.motor_asyncio import AsyncIOMotorClient
 from umongo import Instance
+
+from adapter import config
 
 
 _DATABASE: str = "enterprise"

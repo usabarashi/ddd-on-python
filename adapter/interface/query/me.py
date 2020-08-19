@@ -18,7 +18,7 @@ class ResponseAccount(BaseModel, account.Account):
 
 
 @router.get(
-    path="/me",
+    path="/query/me",
     tags=["query"],
     response_model=ResponseAccount,
     status_code=200,
@@ -27,5 +27,5 @@ class ResponseAccount(BaseModel, account.Account):
 )
 async def get_account(
     actor_account: account.Account = Depends(auth.get_account),
-) -> ResponseAccount:
+):
     return ResponseAccount(**asdict(actor_account))
