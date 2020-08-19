@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 
 from adapter import interface
@@ -22,9 +22,9 @@ approver_id = actor_id
 
 class EmployeeRepositoryMock(employee.Repository):
     @staticmethod
-    async def get(id: int) -> Optional[employee.Employee]:
+    async def get(id: entity.ID) -> Optional[employee.Employee]:
         return employee.Employee(
-            id=actor_id,
+            id=id,
             name="test_employee",
             mail_address="test_mail_address",
             duties=ImmutableSequence(
@@ -40,9 +40,9 @@ class EmployeeRepositoryMock(employee.Repository):
 
 class ApplicationRepositoryMock(application.Repository):
     @staticmethod
-    async def get(id: int) -> Optional[application.Application]:
+    async def get(id: entity.ID) -> Optional[application.Application]:
         return application.Application(
-            id=application_id,
+            id=id,
             applicant_id=applicant_id,
             workflow_id=workflow_id,
             route=application.Route(
@@ -58,7 +58,7 @@ class WorkflowRepositoryMock(workflow.Repository):
     @staticmethod
     async def get(id: entity.ID) -> Optional[workflow.Workflow]:
         return workflow.Workflow(
-            id=workflow_id,
+            id=id,
             name="test",
             description="test",
             duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -77,8 +77,8 @@ command = WorkflowCommand(
 
 
 class Request(BaseModel):
-    actor_id: entity.ID = entity.generate_id()
-    application_id: entity.ID = entity.generate_id()
+    actor_id: str
+    application_id: str
     comment: str = ""
 
 
@@ -101,23 +101,37 @@ class ResponseApplication(BaseModel, application.Application):
 )
 async def approval(request: Request, actor_account: account.Account = Depends(auth.get_account)):
 
-    def error_handling(error: application.Error):
-        if application.NoJobAuthorityError is type(error):
-            raise HTTPException(status_code=403, detail=error)
-        if application.AlreadySottleError is type(error):
-            raise HTTPException(status_code=410, detail=error)
-        if application.NotAnApproverError is type(error):
-            raise HTTPException(status_code=403, detail=error)
-        if application.AlreayApproveError is type(error):
-            raise HTTPException(status_code=403, detail=error)
-        raise HTTPException(status_code=500)
+    # Validate request
+    try:
+        validated_actor_id = entity.ID(request.actor_id)
+        validated_application_id = entity.ID(request.application_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
+    # Command
     result = await command.approval(
-        actor_id=entity.ID(request.actor_id),
-        application_id=entity.ID(request.application_id),
+        actor_id=validated_actor_id,
+        application_id=validated_application_id,
         comment=request.comment,
     )
+
+    # Error handling
     if isinstance(result, Err):
-        error_handling(error=result.value)
+        error = result.value
+        if application.NoJobAuthorityError is type(error):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail=error)
+        if application.AlreadySottleError is type(error):
+            raise HTTPException(status_code=status.HTTP_410_GONE, detail=error)
+        if application.NotAnApproverError is type(error):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail=error)
+        if application.AlreayApproveError is type(error):
+            raise HTTPException(
+                status_code=status.HTTP_410_GONE, detail=error)
+        # FIXME: Alert the system administrator
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # Create resopnse
     else:
         return ResponseApplication(**result.value.as_dict())

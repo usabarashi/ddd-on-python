@@ -10,6 +10,7 @@ _R = TypeVar("_R")  # Role
 class ID(str):
 
     def __init__(self: _S, value: str) -> _S:
+        ulid.from_str(value)  # Validation
         str.__init__(value)
 
     def __eq__(self: _S, other: _S) -> bool:
