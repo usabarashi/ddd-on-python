@@ -1,8 +1,8 @@
-from dataclasses import dataclass
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
+from pydantic.dataclass import dataclass
 
 from adapter import interface
 from adapter.infrastructure.auth import account, auth
@@ -70,9 +70,9 @@ class WorkflowRepositoryMock(workflow.Repository):
 
 
 command = WorkflowCommand(
-    employee_repository=EmployeeRepositoryMock,
-    application_repository=ApplicationRepositoryMock,
-    workflow_repository=WorkflowRepositoryMock,
+    employee_repository=EmployeeRepositoryMock(),
+    application_repository=ApplicationRepositoryMock(),
+    workflow_repository=WorkflowRepositoryMock(),
 )
 
 
@@ -103,8 +103,8 @@ async def approval(request: Request, actor_account: account.Account = Depends(au
 
     # Validate request
     try:
-        validated_actor_id = entity.ID(request.actor_id)
-        validated_application_id = entity.ID(request.application_id)
+        validated_actor_id = entity.ID(value=request.actor_id)
+        validated_application_id = entity.ID(value=request.application_id)
     except Exception:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 

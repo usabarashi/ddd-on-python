@@ -72,9 +72,9 @@ class Test承認:
                     return entity
 
             command = workflow_command.WorkflowCommand(
-                employee_repository=EmployeeRepositoryMock,
-                application_repository=ApplicationRepositoryMock,
-                workflow_repository=WorkflowRepositoryMock,
+                employee_repository=EmployeeRepositoryMock(),
+                application_repository=ApplicationRepositoryMock(),
+                workflow_repository=WorkflowRepositoryMock(),
             )
 
             result = asyncio.run(
@@ -137,9 +137,9 @@ class Test承認:
                     return entity
 
             command = workflow_command.WorkflowCommand(
-                employee_repository=EmployeeRepositoryMock,
-                application_repository=ApplicationRepositoryMock,
-                workflow_repository=WorkflowRepositoryMock,
+                employee_repository=EmployeeRepositoryMock(),
+                application_repository=ApplicationRepositoryMock(),
+                workflow_repository=WorkflowRepositoryMock(),
             )
 
             result = asyncio.run(
