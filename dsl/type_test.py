@@ -3,12 +3,12 @@ from typing import Generic, Literal, TypeVar
 
 from dsl.type import Err, Ok, Result, ImmutableSequence
 
-T = TypeVar("T")
+_T = TypeVar("_T")
 
 # Result
 
 
-def test_result_ok():
+def test_result_Ok():
     def result(x) -> Result[Literal["Err"], Literal["Ok"]]:
         return Ok("Ok") if x else Err("Err")
 
@@ -17,7 +17,7 @@ def test_result_ok():
     assert "Ok" == result(True).value
 
 
-def test_result_err():
+def test_result_Err():
     def result(x) -> Result[Literal["Err"], Literal["Ok"]]:
         return Ok("Ok") if x else Err("Err")
 
@@ -240,18 +240,26 @@ def test_immutable_sequence_map():
 
 def test_immutable_sequence_redece():
     sequence = ImmutableSequence([0, 1, 2])
-    reduced_sequence = sequence.reduce(function=lambda left, right: left * right)
+    reduced_sequence = sequence.reduce(
+        function=lambda left, right: left * right)
     assert reduced_sequence is not sequence
     assert 0 == reduced_sequence
 
 
 def test_immutable_sequence_dataclass():
-    @dataclass(eq=False, frozen=True)
-    class SeqEntity(Generic[T]):
-        value: ImmutableSequence[T] = field(default_factory=ImmutableSequence)
+    @dataclass(frozen=True)
+    class SeqEntity(Generic[_T]):
+        value: ImmutableSequence[_T] = field(
+            default_factory=ImmutableSequence[_T])
 
-    entity = SeqEntity()
+    entity = SeqEntity(value=ImmutableSequence())
     dict_entity = asdict(entity)
     entity_from_dict = SeqEntity(**dict_entity)
     assert {"value": []} == dict_entity == {"value": []}
     assert entity_from_dict == entity == entity_from_dict
+
+    number_entity = SeqEntity(value=ImmutableSequence([0, 1, 2]))
+    dict_number_entity = asdict(number_entity)
+    number_entity_from_dict = SeqEntity(**dict_number_entity)
+    assert {"value": [0, 1, 2]} == dict_number_entity == {"value": [0, 1, 2]}
+    assert number_entity_from_dict == number_entity == number_entity_from_dict
