@@ -1,68 +1,67 @@
+from abc import ABC, abstractmethod
+
 from dataclasses import asdict, dataclass, replace
 from typing import Any, Dict, Type, TypeVar
-
-import ulid
 
 _S = TypeVar("_S")  # Self
 _R = TypeVar("_R")  # Role
 
 
-class ID(str):
+class Id(ABC):
+    """Id
+    """
 
-    def __init__(self: _S, value: str) -> _S:
-        ulid.from_str(value)  # Validation
-        str.__init__(value)
-
+    @abstractmethod
     def __eq__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self) == ulid.from_str(other)
+        raise NotImplementedError
 
+    @abstractmethod
     def __ne__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self) != ulid.from_str(other)
+        raise NotImplementedError
 
-    def __hash__(self: _S) -> int:
-        return hash(ulid.from_str(self))
-
+    @abstractmethod
     def __lt__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self) < ulid.from_str(other)
+        raise NotImplementedError
 
+    @abstractmethod
     def __le__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self) <= ulid.from_str(other)
+        raise NotImplementedError
 
+    @abstractmethod
     def __gt__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self) > ulid.from_str(other)
+        raise NotImplementedError
 
+    @abstractmethod
     def __ge__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self) >= ulid.from_str(other)
+        raise NotImplementedError
 
-
-def generate_id() -> ID:
-    return ID(ulid.new().str)
+    @classmethod
+    @abstractmethod
+    def generate(cls: _S) -> _S:
+        raise NotImplementedError
 
 
 @dataclass(eq=False, frozen=True)
 class Entity:
-    # id: ID = field(default=generate_id())
+    id_: Id
 
     def __eq__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self.id) == ulid.from_str(other.id)
+        return self.id_ == other.id_
 
     def __ne__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self.id) != ulid.from_str(other.id)
-
-    def __hash__(self: _S) -> int:
-        return hash(ulid.from_str(self))
+        return self.id_ != other.id_
 
     def __lt__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self.id) < ulid.from_str(other.id)
+        return self.id_ < other.id_
 
     def __le__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self.id) <= ulid.from_str(other.id)
+        return self.id_ <= other.id_
 
     def __gt__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self.id) > ulid.from_str(other.id)
+        return self.id_ > other.id_
 
     def __ge__(self: _S, other: _S) -> bool:
-        return ulid.from_str(self.id) >= ulid.from_str(other.id)
+        return self.id_ >= other.id_
 
     def _update(self: _S, **changes: ...) -> _S:
         return replace(self, **changes)

@@ -2,7 +2,7 @@ import asyncio
 from typing import Optional
 
 from command import workflow_command
-from domain import application, entity, employee, governance, workflow
+from domain import application, entity, entity_test, employee, governance, workflow
 from dsl.type import Err, Ok, ImmutableSequence
 
 
@@ -17,16 +17,16 @@ class Test承認:
             - 申請に対してアクターが承認/差戻し/却下をおこなっていない.
             """
 
-            actor_id = entity.generate_id()
-            workflow_id = entity.generate_id()
-            application_id = entity.generate_id()
-            applicant_id = entity.generate_id()
+            actor_id = entity_test.IdMock("actor_id")
+            workflow_id = entity_test.IdMock("workflow_id")
+            application_id = entity_test.IdMock("application_id")
+            applicant_id = entity_test.IdMock("applicant_id")
 
             class EmployeeRepositoryMock(employee.Repository):
                 @staticmethod
-                async def get(id: int) -> Optional[employee.Employee]:
+                async def get(id_: int) -> Optional[employee.Employee]:
                     return employee.Employee(
-                        id=actor_id,
+                        id_=actor_id,
                         name="test_employee",
                         mail_address="test_mail_address",
                         duties=ImmutableSequence(
@@ -42,9 +42,9 @@ class Test承認:
 
             class ApplicationRepositoryMock(application.Repository):
                 @staticmethod
-                async def get(id: int) -> Optional[application.Application]:
+                async def get(id_: int) -> Optional[application.Application]:
                     return application.Application(
-                        id=application_id,
+                        id_=application_id,
                         applicant_id=applicant_id,
                         workflow_id=workflow_id,
                         route=application.Route(
@@ -59,9 +59,9 @@ class Test承認:
 
             class WorkflowRepositoryMock(workflow.Repository):
                 @staticmethod
-                async def get(id: entity.ID) -> Optional[workflow.Workflow]:
+                async def get(id_: entity.Id) -> Optional[workflow.Workflow]:
                     return workflow.Workflow(
-                        id=workflow_id,
+                        id_=workflow_id,
                         name="test",
                         description="test",
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -87,15 +87,15 @@ class Test承認:
         @staticmethod
         def test_承認者が対象申請の管掌権限を持っていない場合はエラーとする():
 
-            actor_id = entity.generate_id()
-            workflow_id = entity.generate_id()
-            application_id = entity.generate_id()
+            actor_id = entity_test.IdMock("actor_id")
+            workflow_id = entity_test.IdMock("workflow_id")
+            application_id = entity_test.IdMock("application_id")
 
             class EmployeeRepositoryMock(employee.Repository):
                 @staticmethod
-                async def get(id: int) -> Optional[employee.Employee]:
+                async def get(id_: int) -> Optional[employee.Employee]:
                     return employee.Employee(
-                        id=actor_id,
+                        id_=actor_id,
                         name="test_employee",
                         mail_address="test_mail_address",
                         duties=ImmutableSequence([]),
@@ -109,9 +109,9 @@ class Test承認:
 
             class ApplicationRepositoryMock(application.Repository):
                 @staticmethod
-                async def get(id: int) -> Optional[application.Application]:
+                async def get(id_: int) -> Optional[application.Application]:
                     return application.Application(
-                        id=application_id,
+                        id_=application_id,
                         applicant_id=application_id,
                         workflow_id=workflow_id
                     )
@@ -124,9 +124,9 @@ class Test承認:
 
             class WorkflowRepositoryMock(workflow.Repository):
                 @staticmethod
-                async def get(id: entity.ID) -> Optional[workflow.Workflow]:
+                async def get(id_: entity.Id) -> Optional[workflow.Workflow]:
                     return workflow.Workflow(
-                        id=workflow_id,
+                        id_=workflow_id,
                         name="test",
                         description="test",
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
@@ -143,8 +143,8 @@ class Test承認:
             )
 
             result = asyncio.run(
-                command.approval(actor_id=entity.generate_id(),
-                                 application_id=entity.generate_id(), comment="test")
+                command.approval(actor_id=actor_id,
+                                 application_id=application_id, comment="test")
             )
             assert Err is type(result)
             assert isinstance(result.value, application.NoJobAuthorityError)

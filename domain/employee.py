@@ -13,6 +13,7 @@ _S = TypeVar("_S")
 class Employee(entity.Entity):
     """社員"""
 
+    id_: entity.Id
     name: str
     mail_address: str
     duties: ImmutableSequence[governance.Duties] = field(
@@ -20,7 +21,6 @@ class Employee(entity.Entity):
     )
     join_date: Optional[datetime] = field(default=None)
     retirement_date: Optional[datetime] = field(default=None)
-    id: entity.ID = field(default_factory=entity.generate_id)
 
     @property
     def is_enrolled(self: _S) -> bool:
@@ -53,7 +53,7 @@ class Employee(entity.Entity):
 class Repository(ABC):
     @staticmethod
     @abstractmethod
-    async def get(id: entity.ID) -> Optional[Employee]:
+    async def get(id_: entity.Id) -> Optional[Employee]:
         raise NotImplementedError
 
     @staticmethod

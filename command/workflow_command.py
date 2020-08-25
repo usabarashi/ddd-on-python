@@ -10,37 +10,37 @@ class WorkflowCommand:
     application_repository: application.Repository
     workflow_repository: workflow.Repository
 
-    async def create(self, /, *, actor_id: entity.ID, workflow_id: entity.ID):
+    async def create(self, /, *, actor_id: entity.Id, workflow_id: entity.Id):
         """ワークフローを新規作成する"""
         raise NotImplementedError
 
-    async def edit(self, /, *, actor_id: entity.ID, application_id: entity.ID):
+    async def edit(self, /, *, actor_id: entity.Id, application_id: entity.Id):
         """ワークフローを編集する"""
         raise NotImplementedError
 
-    async def delete(self, /, *, actor_id: entity.ID, application_id: entity.ID):
+    async def delete(self, /, *, actor_id: entity.Id, application_id: entity.Id):
         """ワークフローを削除する"""
         raise NotImplementedError
 
-    async def apply(self, /, *, actor_id: entity.ID):
+    async def apply(self, /, *, actor_id: entity.Id):
         """申請する"""
         raise NotImplementedError
 
     async def approval(
-        self, /, *, actor_id: entity.ID, application_id: entity.ID, comment: str
+        self, /, *, actor_id: entity.Id, application_id: entity.Id, comment: str
     ) -> Result[application.Error, application.Application]:
         """申請を承認する"""
 
-        actor = await self.employee_repository.get(id=actor_id)
+        actor = await self.employee_repository.get(id_=actor_id)
         if actor is None:
             raise FileNotFoundError
 
-        approve_application = await self.application_repository.get(id=application_id)
+        approve_application = await self.application_repository.get(id_=application_id)
         if approve_application is None:
             raise FileNotFoundError
 
         approve_workflow = await self.workflow_repository.get(
-            id=approve_application.workflow_id
+            id_=approve_application.workflow_id
         )
         if approve_workflow is None:
             raise FileNotFoundError

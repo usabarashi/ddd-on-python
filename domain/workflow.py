@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, TypeVar
 from enum import Enum
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import domain
 from domain import entity, employee, governance
@@ -38,21 +38,23 @@ class NoJobAuthorityError(Error):
 class Workflow(entity.Entity):
     """ワークフロー"""
 
+    id_: entity.Id
     name: str
     description: str
     duties: governance.Duties = governance.Duties.MANAGEMENT_DEPARTMENT
-    id: entity.ID = field(default_factory=entity.generate_id)
 
     @staticmethod
-    def create_template(name: str, description: str, duties: governance.Duties) -> _S:
+    def create_template(
+        id_: entity.Id, name: str, description: str, duties: governance.Duties
+    ) -> _S:
         """Factory method"""
-        return Workflow(name=name, description=description, duties=duties)
+        return __class__(id_=id_, name=name, description=description, duties=duties)
 
 
 class Repository(ABC):
     @staticmethod
     @abstractmethod
-    async def get(id: entity.ID) -> Optional[Workflow]:
+    async def get(id_: entity.Id) -> Optional[Workflow]:
         raise NotImplementedError
 
     @staticmethod
@@ -60,17 +62,12 @@ class Repository(ABC):
     async def save(entity: Workflow) -> Workflow:
         raise NotImplementedError
 
-    @staticmethod
-    @abstractmethod
-    async def remove(entity: Workflow) -> Workflow:
-        raise NotImplementedError
-
 
 class ManagerRole(employee.Employee):
     """部門管理者ロール"""
 
     def create(
-        self, /, *, name: str, description: str, duties: governance.Duties
+        self, /, *, id_: entity.Id, name: str, description: str, duties: governance.Duties
     ) -> Result[domain.Error, Workflow]:
         """ワークフローを新規作成する"""
 
@@ -81,7 +78,7 @@ class ManagerRole(employee.Employee):
         if duties not in self.duties:
             return Err(NoJobAuthorityError("職務権限がありません."))
 
-        return Ok(Workflow(name=name, description=description, duties=duties))
+        return Ok(Workflow(id_=id_, name=name, description=description, duties=duties))
 
     def edit(
         self, /, *, workflow: Workflow, name=None, description=None, duties=None

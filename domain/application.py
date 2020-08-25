@@ -20,7 +20,7 @@ class Judgment(Enum):
 class Progress:
     """進捗"""
 
-    approver_id: entity.ID
+    approver_id: entity.Id
     approve: Optional[Judgment] = field(default=None)
     datetime: Optional[_datetime] = field(default=None)
     comment: Optional[str] = field(default=None)
@@ -43,7 +43,7 @@ class Route(ImmutableSequence[Progress]):
         return (
             0
             < self.filter(
-                function=lambda process: process.approver_id == approver.id
+                function=lambda process: process.approver_id == approver.id_
             ).size()
         )
 
@@ -52,7 +52,7 @@ class Route(ImmutableSequence[Progress]):
         return (
             0
             < self.filter(
-                function=lambda process: process.approver_id == approver.id
+                function=lambda process: process.approver_id == approver.id_
                 and process.datetime is not None
             ).size()
         )
@@ -61,22 +61,22 @@ class Route(ImmutableSequence[Progress]):
         """承認を追加する"""
         return self.map(
             function=lambda progress: Progress(
-                approver_id=approver.id,
+                approver_id=approver.id_,
                 approve=Judgment.APPROVED,
                 datetime=_datetime.now(),
                 comment=comment,
             )
-            if progress.approver_id == approver.id
+            if progress.approver_id == approver.id_
             else progress
         )
 
 
 @dataclass(eq=False, frozen=True)
 class Application(entity.Entity):
-    applicant_id: entity.ID
-    workflow_id: entity.ID
+    id_: entity.Id
+    applicant_id: entity.Id
+    workflow_id: entity.Id
     route: Route = field(default_factory=Route)
-    id: entity.ID = field(default_factory=entity.generate_id)
 
     def process(self: _S, approver: employee.Employee, comment: str) -> _S:
         """処理する"""
@@ -89,7 +89,7 @@ class Application(entity.Entity):
 class Repository(ABC):
     @staticmethod
     @abstractmethod
-    async def get(id: entity.ID) -> Optional[Application]:
+    async def get(id_: entity.Id) -> Optional[Application]:
         raise NotImplementedError
 
     @staticmethod
