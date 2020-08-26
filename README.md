@@ -7,11 +7,6 @@ Trial and error of DDD on Python.
 ![model](packages.png)
 
 
-```
-$ code ./ 
-$ pipenv run update_model 
-```
-
 ## Setting up a development environment 
 
 1. [Build the container in advance.](https://github.com/usabarashi/ddd-on-python-composer)
@@ -19,7 +14,6 @@ $ pipenv run update_model
 1. Set up the environment inside the container. Using VSCode's Remote Container.
 
 ```
-$ code ./ 
 $ pipenv install
 $ pipenv install --dev
 ```
@@ -27,7 +21,6 @@ $ pipenv install --dev
 ## Run
 
 ```
-$ code ./ 
 $ pipenv run start 
 ```
 
@@ -38,7 +31,6 @@ $ pipenv run start
 ## Test
 
 ```
-$ code ./ 
 $ pipenv run test 
 ```
 

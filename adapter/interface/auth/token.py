@@ -1,23 +1,23 @@
 """Auth
 """
 
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from pydantic.dataclasses import dataclass
 
-from adapter.infrastructure.auth import auth, token
+from adapter.infrastructure.auth import auth, token_dao
 from dsl.type import Err
 
 router = APIRouter()
 
 
 @dataclass(frozen=True)
-class ResponseToken(BaseModel, token.Token):
-    pass
+class ResponseToken(BaseModel, token_dao.Token):
+    access_token: str
+    token_type: str
 
 
 @router.get(
@@ -29,7 +29,7 @@ class ResponseToken(BaseModel, token.Token):
     description="Management.",
 )
 async def find_token():
-    return [ResponseToken(**asdict(got_token)) async for got_token in token.find()]
+    return [ResponseToken(**asdict(got_token)) async for got_token in token_dao.find()]
 
 
 @router.post(
@@ -53,5 +53,5 @@ async def create_token(request: OAuth2PasswordRequestForm = Depends()):
         )
     else:
         authed_account = auth_result.value
-        created_token = await auth.create_token(key=authed_account.username, expires_delta=None)
+        created_token = await auth.create_token(key=authed_account.id_, expires_delta=None)
         return ResponseToken(**asdict(created_token))

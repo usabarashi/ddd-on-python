@@ -11,12 +11,13 @@ flake8 = "3.8.3"
 mypy = "0.783"
 pylint = "2.5.3"
 yapf = "0.30.0"
+pytest = "5.4.3"
+pytest-asyncio = "*"
 
 [packages]
 fastapi = "0.59.3"
 passlib = {extras = ["bcrypt"], version = "1.7.2"}
 pydantic = "1.6"
-pytest = "5.4.3"
 python-jose = {extras = ["cryptography"], version = "3.2.0"}
 python-multipart = "0.0.5"
 pyyaml = "5.3.1"
@@ -29,5 +30,4 @@ python_version = "3.8"
 
 [scripts]
 start = "uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
-test = "pytest domain/ command/"
-updae_model = "pyreverse -o png --ignore=__init___test.py domain/"
+test = "bash -c 'pytest -vv domain/ command/ query/ adapter/ && pyreverse -o png  --ignore=__init__.py  --ignore=entity.py --ignore=entity_test.py domain/'"

@@ -12,7 +12,7 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from adapter import config
-from adapter.infrastructure.auth import account, token
+from adapter.infrastructure.auth import account_dao, token_dao
 from dsl.type import Err, Ok, Result
 
 # to get a string like this run:
@@ -25,10 +25,10 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=CREATE_TOKEN_ENDPOINT)
 
 
-async def authenticate(username: str, password: str) -> Result[Literal[False], account.Account]:
+async def authenticate(username: str, password: str) -> Result[Literal[False], account_dao.Account]:
     """認証
     """
-    got_account = await account.get(username=username)
+    got_account = await account_dao.find(username=username)
     if got_account is None or not verify_password(
         plain_password=password, hashed_password=got_account.hashed_password
     ):
@@ -46,7 +46,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 async def create_token(
     key: str,
     expires_delta: Optional[timedelta] = timedelta(minutes=EXPIRE_MINUTES),
-) -> token.Token:
+) -> token_dao.Token:
     """トークン生成
     """
     to_encode: Dict[str, Any] = {"sub": key}.copy()
@@ -56,11 +56,11 @@ async def create_token(
         expire = datetime.utcnow() + timedelta(minutes=15)
     to_encode.update({"exp": expire})
 
-    created_token = token.Token(
+    created_token = token_dao.Token(
         access_token=jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM),
         token_type="bearer",
     )
-    saved_token = await token.save(entity=created_token)
+    saved_token = await token_dao.save(entity=created_token)
     return saved_token
 
 
@@ -70,7 +70,7 @@ def to_hash(string: str) -> str:
     return pwd_context.hash(string)
 
 
-async def get_account(token: str = Depends(oauth2_scheme)) -> account.Account:
+async def get_account(token: str = Depends(oauth2_scheme)) -> account_dao.Account:
     """アカウント取得
     """
 
@@ -83,14 +83,14 @@ async def get_account(token: str = Depends(oauth2_scheme)) -> account.Account:
     # Decode jwt
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if username is None:
+        id_ = payload.get("sub")
+        if id_ is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
 
     # Get active account
-    got_active_account = await account.get(username=username)
+    got_active_account = await account_dao.get(id_=id_)
     if got_active_account is None:
         raise credentials_exception
 

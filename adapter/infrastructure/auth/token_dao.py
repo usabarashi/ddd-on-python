@@ -13,28 +13,14 @@ from adapter.infrastructure import mongodb
 class Token:
     """DTO
     """
-    access_token: str = ""
-    token_type: str = ""
+    access_token: str
+    token_type: str
 
 
 @mongodb.connector.register
 class TokenDAO(MotorAsyncIODocument):
-    """
-    e.g.:
-        {
-            _id: ObjectId('5f39116966b97900069998bd'),
-            username: 'johndoe',
-            full_name: 'John Doe',
-            email: 'johndoe@example.com',
-            // plain_password: password
-            hashed_password: '$2b$12$zfo4.zaRPiE4ArMukvG/.u4hHX1J0R3WKbIQLFliGqUURxthctyZ2',
-            disabled: false
-        }
-    """
-    access_token = umongo.fields.StringField(
-        required=True, attribute="access_token")
-    token_type = umongo.fields.StringField(
-        required=True, attribute="token_type")
+    access_token = umongo.fields.StringField(required=True)
+    token_type = umongo.fields.StringField(required=True)
 
     class Meta:
         collection_name = "token"
@@ -48,14 +34,13 @@ async def get(access_token: str) -> Optional[Token]:
 
     got_dict = got_document.dump()
     del got_dict["id"]
-
-    return Token(**got_dict)
+    return Token(**got_document.dump())
 
 
 async def find() -> Generator[Token, None, None]:
-    documents: Iterable[MotorAsyncIODocument] = await TokenDAO.find().to_list(length=10)
-    for document in documents:
-        got_dict = document.dump()
+    got_documents: Iterable[MotorAsyncIODocument] = await TokenDAO.find().to_list(length=10)
+    for got_document in got_documents:
+        got_dict = got_document.dump()
         del got_dict["id"]
         yield Token(**got_dict)
 
