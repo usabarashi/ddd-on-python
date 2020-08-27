@@ -1,4 +1,6 @@
 """Account
+
+EmployeeCollectionを参照して認証に必要なAccount情報だけ取得する.
 """
 
 from dataclasses import dataclass
@@ -16,34 +18,18 @@ class Account:
     """
     id_: str
     username: str
-    full_name: str
-    email: str
     hashed_password: str
 
 
 @mongodb.connector.register
 class AccountDocument(MotorAsyncIODocument):
-    """
-    e.g.:
-        {
-            _id: ULID,
-            username: 'johndoe',
-            full_name: 'John Doe',
-            email: 'johndoe@example.com',
-            // plain_password: password
-            hashed_password: '$2b$12$zfo4.zaRPiE4ArMukvG/.u4hHX1J0R3WKbIQLFliGqUURxthctyZ2',
-            disabled: false
-        }
-    """
     id_ = umongo.fields.StringField(required=True, attribute="_id")
     username = umongo.fields.StringField(required=True)
-    full_name = umongo.fields.StringField(required=True)
-    email = umongo.fields.StringField(required=True)
     hashed_password = umongo.fields.StringField(required=False)
     disabled = umongo.fields.BooleanField(require=True)
 
     class Meta:
-        collection_name = "account"
+        collection_name = "employee"
 
 
 async def get(id_: str) -> Optional[Account]:

@@ -12,15 +12,17 @@ _S = TypeVar("_S")
 @dataclass(eq=False, frozen=True)
 class Employee(entity.Entity):
     """社員"""
-
     id_: entity.Id
-    name: str
-    mail_address: str
+    username: str
+    full_name: str
+    email_address: str
+    hashed_password: str
     duties: ImmutableSequence[governance.Duties] = field(
         default_factory=ImmutableSequence
     )
     join_date: Optional[datetime] = field(default=None)
     retirement_date: Optional[datetime] = field(default=None)
+    disabled: bool = False
 
     @property
     def is_enrolled(self: _S) -> bool:

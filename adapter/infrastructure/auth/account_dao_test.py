@@ -7,7 +7,7 @@ import pytest
 @pytest.mark.asyncio
 async def test_odm():
     from adapter.infrastructure import mongodb
-    from adapter.infrastructure.mongodb.dao import account_dao
+    from adapter.infrastructure.auth import account_dao
 
     test_id = mongodb.ULID.generate()
 
@@ -15,8 +15,6 @@ async def test_odm():
     insert_document = account_dao.AccountDocument(
         id_=test_id,
         username="test",
-        full_name="test",
-        email="test",
         hashed_password="test",
         disabled=False
     )

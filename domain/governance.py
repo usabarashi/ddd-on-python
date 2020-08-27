@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 from datetime import datetime
 from typing import TypeVar
 
@@ -8,7 +8,7 @@ _T = TypeVar("_T")
 
 @dataclass(eq=False, frozen=True)
 class BussinessDateTime(datetime):
-    class WeekDay(Enum):
+    class WeekDay(IntEnum):
         MON = 0
         TUE = 1
         WEB = 2
@@ -38,7 +38,7 @@ class BussinessDateTime(datetime):
         raise NotImplementedError
 
 
-class Duties(Enum):
+class Duties(IntEnum):
     """業務分掌"""
 
     MANAGEMENT_DEPARTMENT = 0

@@ -70,7 +70,7 @@ def to_hash(string: str) -> str:
     return pwd_context.hash(string)
 
 
-async def get_account(token: str = Depends(oauth2_scheme)) -> account_dao.Account:
+async def get_id(token: str = Depends(oauth2_scheme)) -> str:
     """アカウント取得
     """
 
@@ -94,4 +94,4 @@ async def get_account(token: str = Depends(oauth2_scheme)) -> account_dao.Accoun
     if got_active_account is None:
         raise credentials_exception
 
-    return got_active_account
+    return got_active_account.id_
