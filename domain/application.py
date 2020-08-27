@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, TypeVar
-from enum import Enum
+from enum import IntEnum
 from datetime import datetime as _datetime
 from dataclasses import dataclass, field
 
@@ -11,7 +11,7 @@ from dsl.type import ImmutableSequence, Err, Ok, Result
 _S = TypeVar("_S")
 
 
-class Judgment(Enum):
+class Judgment(IntEnum):
     APPROVED = 0
     REJECTED = 1
 

@@ -1,8 +1,8 @@
 import asyncio
-from typing import Optional
+from typing import Optional, Tuple
 
 from command import workflow_command
-from domain import application, entity, entity_test, employee, governance, workflow
+from domain import application, entity, entity_test, employee, governance, repository, workflow
 from dsl.type import Err, Ok, ImmutableSequence
 
 
@@ -22,28 +22,31 @@ class Test承認:
             application_id = entity_test.IdMock("application_id")
             applicant_id = entity_test.IdMock("applicant_id")
 
-            class EmployeeRepositoryMock(employee.Repository):
+            class RepositoryMock(repository.Repository):
                 @staticmethod
-                async def get(id_: int) -> Optional[employee.Employee]:
-                    return employee.Employee(
-                        id_=actor_id,
-                        name="test_employee",
-                        mail_address="test_mail_address",
+                async def get(
+                    employee_id: entity.Id,
+                    application_id: entity.Id
+                ) -> Tuple[
+                    Optional[employee.Employee],
+                    Optional[application.Application],
+                    Optional[workflow.Workflow]
+                ]:
+                    employee_entity = employee.Employee(
+                        id_=employee_id,
+                        username="test",
+                        full_name="test",
+                        email_address="test",
                         duties=ImmutableSequence(
                             [governance.Duties.MANAGEMENT_DEPARTMENT]
                         ),
                         join_date=None,
                         retirement_date=None,
+                        hashed_password="",
+                        disabled=False,
                     )
 
-                @staticmethod
-                async def save(entity: employee.Employee) -> employee.Employee:
-                    return entity
-
-            class ApplicationRepositoryMock(application.Repository):
-                @staticmethod
-                async def get(id_: int) -> Optional[application.Application]:
-                    return application.Application(
+                    application_entity = application.Application(
                         id_=application_id,
                         applicant_id=applicant_id,
                         workflow_id=workflow_id,
@@ -51,31 +54,29 @@ class Test承認:
                             [application.Progress(approver_id=actor_id)]),
                     )
 
-                @staticmethod
-                async def save(
-                    entity: application.Application,
-                ) -> application.Application:
-                    return entity
-
-            class WorkflowRepositoryMock(workflow.Repository):
-                @staticmethod
-                async def get(id_: entity.Id) -> Optional[workflow.Workflow]:
-                    return workflow.Workflow(
+                    workflow_entity = workflow.Workflow(
                         id_=workflow_id,
                         name="test",
                         description="test",
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
                     )
 
+                    return employee_entity, application_entity, workflow_entity
+
                 @staticmethod
-                async def save(entity: workflow.Workflow) -> workflow.Workflow:
-                    return entity
+                async def save(
+                    employee_entity: employee.Employee,
+                    application_entity: application.Application,
+                    workflow_entity: workflow.Workflow,
+                ) -> Tuple[
+                    employee.Employee,
+                    application.Application,
+                    workflow.Workflow
+                ]:
+                    return employee_entity, application_entity, workflow_entity
 
             command = workflow_command.WorkflowCommand(
-                employee_repository=EmployeeRepositoryMock(),
-                application_repository=ApplicationRepositoryMock(),
-                workflow_repository=WorkflowRepositoryMock(),
-            )
+                repository=RepositoryMock())
 
             result = asyncio.run(
                 command.approval(actor_id=actor_id,
@@ -91,56 +92,57 @@ class Test承認:
             workflow_id = entity_test.IdMock("workflow_id")
             application_id = entity_test.IdMock("application_id")
 
-            class EmployeeRepositoryMock(employee.Repository):
+            class RepositoryMock(repository.Repository):
                 @staticmethod
-                async def get(id_: int) -> Optional[employee.Employee]:
-                    return employee.Employee(
-                        id_=actor_id,
-                        name="test_employee",
-                        mail_address="test_mail_address",
+                async def get(
+                    employee_id: entity.Id,
+                    application_id: entity.Id
+                ) -> Tuple[
+                    Optional[employee.Employee],
+                    Optional[application.Application],
+                    Optional[workflow.Workflow]
+                ]:
+                    employee_entty = employee.Employee(
+                        id_=employee_id,
+                        username="test_employee",
+                        full_name="test",
+                        email_address="test_mail_address",
                         duties=ImmutableSequence([]),
                         join_date=None,
                         retirement_date=None,
+                        hashed_password="",
+                        disabled=False,
                     )
 
-                @staticmethod
-                async def save(entity: employee.Employee) -> employee.Employee:
-                    return entity
-
-            class ApplicationRepositoryMock(application.Repository):
-                @staticmethod
-                async def get(id_: int) -> Optional[application.Application]:
-                    return application.Application(
+                    application_entity = application.Application(
                         id_=application_id,
                         applicant_id=application_id,
                         workflow_id=workflow_id
                     )
 
-                @staticmethod
-                async def save(
-                    entity: application.Application,
-                ) -> application.Application:
-                    return entity
-
-            class WorkflowRepositoryMock(workflow.Repository):
-                @staticmethod
-                async def get(id_: entity.Id) -> Optional[workflow.Workflow]:
-                    return workflow.Workflow(
+                    workflow_entity = workflow.Workflow(
                         id_=workflow_id,
                         name="test",
                         description="test",
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
                     )
 
+                    return employee_entty, application_entity, workflow_entity
+
                 @staticmethod
-                async def save(entity: workflow.Workflow) -> workflow.Workflow:
-                    return entity
+                async def save(
+                    employee_entity: employee.Employee,
+                    application_entity: application.Application,
+                    workflow_entity: workflow.Workflow,
+                ) -> Tuple[
+                    employee.Employee,
+                    application.Application,
+                    workflow.Workflow
+                ]:
+                    return employee_entity, application_entity, workflow_entity
 
             command = workflow_command.WorkflowCommand(
-                employee_repository=EmployeeRepositoryMock(),
-                application_repository=ApplicationRepositoryMock(),
-                workflow_repository=WorkflowRepositoryMock(),
-            )
+                repository=RepositoryMock())
 
             result = asyncio.run(
                 command.approval(actor_id=actor_id,
