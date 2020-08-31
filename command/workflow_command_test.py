@@ -6,7 +6,7 @@ from domain import application, entity, entity_test, employee, governance, repos
 from dsl.type import Err, Ok, ImmutableSequence
 
 
-class Test承認:
+class Test継承:
     class Test正常系:
         @staticmethod
         def test_承認する():

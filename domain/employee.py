@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional, TypeVar
@@ -50,15 +49,3 @@ class Employee(entity.Entity):
     def leave_duties(self: _S, duties: governance.Duties) -> _S:
         """職務から離任する"""
         return self._update(duties=self.duties.remove(duties))
-
-
-class Repository(ABC):
-    @staticmethod
-    @abstractmethod
-    async def get(id_: entity.Id) -> Optional[Employee]:
-        raise NotImplementedError
-
-    @staticmethod
-    @abstractmethod
-    async def save(entity: Employee) -> Employee:
-        raise NotImplementedError

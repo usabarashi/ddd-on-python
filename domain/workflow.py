@@ -1,5 +1,4 @@
-from abc import ABC, abstractmethod
-from typing import Optional, TypeVar
+from typing import TypeVar
 from enum import Enum
 from dataclasses import dataclass
 
@@ -49,18 +48,6 @@ class Workflow(entity.Entity):
     ) -> _S:
         """Factory method"""
         return __class__(id_=id_, name=name, description=description, duties=duties)
-
-
-class Repository(ABC):
-    @staticmethod
-    @abstractmethod
-    async def get(id_: entity.Id) -> Optional[Workflow]:
-        raise NotImplementedError
-
-    @staticmethod
-    @abstractmethod
-    async def save(entity: Workflow) -> Workflow:
-        raise NotImplementedError
 
 
 class ManagerRole(employee.Employee):

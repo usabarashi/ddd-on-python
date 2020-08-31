@@ -16,7 +16,7 @@ from command.workflow_command import WorkflowCommand
 
 router = APIRouter()
 
-command = WorkflowCommand(repository=workflow_repository.Repository())
+command = WorkflowCommand(repository=workflow_repository.WorkflowRepository())
 
 
 class Request(BaseModel):

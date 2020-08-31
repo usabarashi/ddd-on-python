@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from typing import List, Optional, TypeVar
 from enum import IntEnum
 from datetime import datetime as _datetime
@@ -84,18 +83,6 @@ class Application(entity.Entity):
             route=self.route.progress_approve(
                 approver=approver, comment=comment)
         )
-
-
-class Repository(ABC):
-    @staticmethod
-    @abstractmethod
-    async def get(id_: entity.Id) -> Optional[Application]:
-        raise NotImplementedError
-
-    @staticmethod
-    @abstractmethod
-    async def save(entity: Application) -> Application:
-        raise NotImplementedError
 
 
 class Error(domain.Error):

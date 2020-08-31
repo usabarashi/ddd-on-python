@@ -4,7 +4,7 @@ from adapter.infrastructure.mongodb.dao import employee_dao, application_dao, wo
 from domain import application, employee, entity, repository, workflow
 
 
-class Repository(repository.Repository):
+class WorkflowRepository(repository.Repository):
 
     @staticmethod
     async def get(
