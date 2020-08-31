@@ -60,7 +60,7 @@ class ULID(entity.Id, str):
 
 
 def _create_connector() -> Instance:
-    uri: str = config["adapter"]["infrastructure"]["mongo"]["URI"]
+    uri: str = config["adapter"]["infrastructure"]["mongodb"]["URI"]
     database: str = "enterprise"
     client: AsyncIOMotorClient = AsyncIOMotorClient(uri)
     return Instance(client[database])
