@@ -1,12 +1,15 @@
 from dataclasses import dataclass
+from typing import Type, TypeVar
 
 from domain import application, entity, repository
 from dsl.type import Err, Ok, Result
 
+_T = TypeVar("_T")
+
 
 @dataclass
 class WorkflowCommand:
-    repository: repository.Repository
+    repository: Type[repository.Repository]
 
     async def create(self, /, *, actor_id: entity.Id, workflow_id: entity.Id):
         """ワークフローを新規作成する"""
@@ -43,9 +46,5 @@ class WorkflowCommand:
         if isinstance(result, Err):
             return Err(value=result.value)
         else:
-            _, saved_application, _ = await self.repository.save(
-                employee_entity=actor,
-                application_entity=result.value,
-                workflow_entity=approve_workflow
-            )
+            _, saved_application, _ = await self.repository.save(application_entity=result.value)
             return Ok(value=saved_application)

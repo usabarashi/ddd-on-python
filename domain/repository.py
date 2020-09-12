@@ -1,10 +1,10 @@
-from abc import abstractclassmethod
+from abc import ABC, abstractclassmethod
 from typing import Optional, Tuple
 
 from domain import application, employee, entity, workflow
 
 
-class Repository:
+class Repository(ABC):
 
     @staticmethod
     @abstractclassmethod
@@ -21,8 +21,12 @@ class Repository:
     @staticmethod
     @abstractclassmethod
     async def save(
-        employee_entity: entity.Entity,
-        application_entity: entity.Entity,
-        workflow_entity: entity.Entity
-    ) -> Tuple[employee.Employee, application.Application, workflow.Workflow]:
+        employee_entity: Optional[entity.Entity] = None,
+        application_entity: Optional[entity.Entity] = None,
+        workflow_entity: Optional[entity.Entity] = None
+    ) -> Tuple[
+        Optional[employee.Employee],
+        Optional[application.Application],
+        Optional[workflow.Workflow]
+    ]:
         raise NotImplementedError

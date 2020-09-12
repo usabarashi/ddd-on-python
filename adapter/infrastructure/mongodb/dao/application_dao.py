@@ -1,6 +1,5 @@
 """ApplicationDAO
 """
-
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Generator, Iterable, List, Optional
@@ -16,27 +15,28 @@ from domain import application, entity
 class Progress:
     """DTO
     """
-    approver_id: entity.Id
+    approver_id: str
     approve: Optional[application.Judgment]
-    datetime_: Optional[datetime]
+    process_datetime: Optional[datetime]
     comment: Optional[str]
-
-
-class ProgressDocument(umongo.Document):
-    approver_id = umongo.fields.StringField()
-    approve = umongo.fields.IntegerField(allow_none=True)
-    datetime_ = umongo.fields.DateTimeField(allow_none=True)
-    comment = umongo.fields.StrField(allow_none=True)
 
 
 @dataclass(frozen=True)
 class Application:
     """DTO
     """
-    id_: entity.Id
-    applicant_id: entity.Id
-    workflow_id: entity.Id
+    id_: str
+    applicant_id: str
+    workflow_id: str
     route: List[Progress]
+
+
+@mongodb.connector.register
+class ProgressDocument(umongo.EmbeddedDocument):
+    approver_id = umongo.fields.StrField()
+    approve = umongo.fields.IntegerField(allow_none=True)
+    process_datetime = umongo.fields.DateTimeField(allow_none=True)
+    comment = umongo.fields.StrField(allow_none=True)
 
 
 @mongodb.connector.register
@@ -44,7 +44,8 @@ class ApplicationDocument(MotorAsyncIODocument):
     id_ = umongo.fields.StringField(required=True, attribute="_id")
     applicant_id = umongo.fields.StringField()
     workflow_id = umongo.fields.StringField()
-    route = umongo.fields.ListField(umongo.fields.DictField(ProgressDocument))
+    route = umongo.fields.ListField(
+        umongo.fields.EmbeddedField(ProgressDocument))
 
     class Meta:
         collection_name = "application"
@@ -54,7 +55,17 @@ async def get(id_: entity.Id) -> Optional[Application]:
     got_document = await ApplicationDocument.find_one({"id_": id_})
     if got_document is None:
         return None
-    return Application(**got_document.dump())
+    return Application(
+        id_=got_document.id_,
+        applicant_id=got_document.applicant_id,
+        workflow_id=got_document.workflow_id,
+        route=[Progress(
+            approver_id=progress.approver_id,
+            approve=progress.approve,
+            process_datetime=progress.process_datetime,
+            comment=progress.comment)
+            for progress in got_document.route]
+    )
 
 
 async def find() -> Generator[Application, None, None]:

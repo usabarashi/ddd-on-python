@@ -39,7 +39,7 @@ class ResponseAccount(BaseModel, employee_dao.Employee):
 async def get_account(
     actor_id: str = Depends(auth.get_id),
 ):
-    got_employee = await account.get_account(id_=mongodb.ULID(actor_id))
+    got_employee = await account.get_account(id_=mongodb.ULID(value=actor_id))
     if got_employee is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return ResponseAccount(**asdict(got_employee))

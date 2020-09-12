@@ -1,7 +1,7 @@
-from typing import List, Optional, TypeVar
 from enum import IntEnum
-from datetime import datetime as _datetime
 from dataclasses import dataclass, field
+from datetime import datetime
+from typing import List, Optional, TypeVar
 
 import domain
 from domain import entity, employee, workflow
@@ -21,14 +21,16 @@ class Progress:
 
     approver_id: entity.Id
     approve: Optional[Judgment] = field(default=None)
-    datetime: Optional[_datetime] = field(default=None)
+    process_datetime: Optional[datetime] = field(default=None)
     comment: Optional[str] = field(default=None)
 
 
 class Route(ImmutableSequence[Progress]):
     """承認経路"""
 
-    def __init__(self, sequence: List[Progress] = list()):
+    def __init__(self, sequence: List[Progress] = None):
+        if sequence is None:
+            sequence = []
         ImmutableSequence.__init__(self, sequence)
 
     def is_complete(self) -> bool:
@@ -52,7 +54,7 @@ class Route(ImmutableSequence[Progress]):
             0
             < self.filter(
                 function=lambda process: process.approver_id == approver.id_
-                and process.datetime is not None
+                and process.process_datetime is not None
             ).size()
         )
 
@@ -62,7 +64,7 @@ class Route(ImmutableSequence[Progress]):
             function=lambda progress: Progress(
                 approver_id=approver.id_,
                 approve=Judgment.APPROVED,
-                datetime=_datetime.now(),
+                process_datetime=datetime.now(),
                 comment=comment,
             )
             if progress.approver_id == approver.id_
@@ -113,7 +115,7 @@ class ApproverRole(employee.Employee):
         """処理の有無"""
         if workflow.duties not in self.duties:
             return False
-        if application.route.is_complete:
+        if application.route.is_complete():
             return False
         if not application.route.has_approver(approver=self):
             return False

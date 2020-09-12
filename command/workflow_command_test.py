@@ -6,7 +6,7 @@ from domain import application, entity, entity_test, employee, governance, repos
 from dsl.type import Err, Ok, ImmutableSequence
 
 
-class Test継承:
+class Test承認:
     class Test正常系:
         @staticmethod
         def test_承認する():
@@ -65,18 +65,18 @@ class Test継承:
 
                 @staticmethod
                 async def save(
-                    employee_entity: employee.Employee,
-                    application_entity: application.Application,
-                    workflow_entity: workflow.Workflow,
+                    employee_entity: employee.Employee = None,
+                    application_entity: application.Application = None,
+                    workflow_entity: workflow.Workflow = None,
                 ) -> Tuple[
-                    employee.Employee,
-                    application.Application,
-                    workflow.Workflow
+                    Optional[employee.Employee],
+                    Optional[application.Application],
+                    Optional[workflow.Workflow]
                 ]:
                     return employee_entity, application_entity, workflow_entity
 
             command = workflow_command.WorkflowCommand(
-                repository=RepositoryMock())
+                repository=RepositoryMock)
 
             result = asyncio.run(
                 command.approval(actor_id=actor_id,
@@ -102,7 +102,7 @@ class Test継承:
                     Optional[application.Application],
                     Optional[workflow.Workflow]
                 ]:
-                    employee_entty = employee.Employee(
+                    employee_entity = employee.Employee(
                         id_=employee_id,
                         username="test_employee",
                         full_name="test",
@@ -127,26 +127,27 @@ class Test継承:
                         duties=governance.Duties.MANAGEMENT_DEPARTMENT,
                     )
 
-                    return employee_entty, application_entity, workflow_entity
+                    return employee_entity, application_entity, workflow_entity
 
                 @staticmethod
                 async def save(
-                    employee_entity: employee.Employee,
-                    application_entity: application.Application,
-                    workflow_entity: workflow.Workflow,
+                    employee_entity: employee.Employee = None,
+                    application_entity: application.Application = None,
+                    workflow_entity: workflow.Workflow = None,
                 ) -> Tuple[
-                    employee.Employee,
-                    application.Application,
-                    workflow.Workflow
+                    Optional[employee.Employee],
+                    Optional[application.Application],
+                    Optional[workflow.Workflow]
                 ]:
                     return employee_entity, application_entity, workflow_entity
 
             command = workflow_command.WorkflowCommand(
-                repository=RepositoryMock())
+                repository=RepositoryMock)
 
-            result = asyncio.run(
-                command.approval(actor_id=actor_id,
-                                 application_id=application_id, comment="test")
-            )
+            result = asyncio.run(command.approval(
+                actor_id=actor_id,
+                application_id=application_id,
+                comment="test"
+            ))
             assert Err is type(result)
             assert isinstance(result.value, application.NoJobAuthorityError)

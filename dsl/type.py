@@ -46,7 +46,9 @@ class ImmutableSequence(List, Generic[_T]):
 
     # Override the list method
 
-    def __init__(self: _S, items: Iterable[_T] = list()) -> _S:
+    def __init__(self: _S, items: List[_T]) -> _S:
+        if items is None:
+            items = list()
         list.__init__(self, items)
 
     def __add__(self: _S, other: List[_T]) -> _S:
@@ -118,10 +120,10 @@ class ImmutableSequence(List, Generic[_T]):
         return len(self)
 
     def map(self: _S, /, *, function: Callable[[_T], _A]) -> _B:
-        return __class__(function(element) for element in self)
+        return __class__([function(element) for element in self])
 
     def reduce(self: _S, /, *, function: Callable[[_T, _T], _T]) -> _T:
         return reduce(function, self)
 
     def filter(self: _S, /, *, function: Callable[[_T], bool]) -> _S:
-        return __class__(element for element in self if function(element))
+        return __class__([element for element in self if function(element)])

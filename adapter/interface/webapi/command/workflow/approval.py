@@ -3,20 +3,19 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from pydantic.dataclasses import dataclass
 
 from adapter import interface
-from adapter.infrastructure import mongodb
+from adapter.infrastructure.mongodb.repository import repository_impl
 from adapter.infrastructure.auth import auth
-from adapter.infrastructure.mongodb.repository import workflow_repository
-from domain import application
-from dsl.type import Err
+from adapter.infrastructure import mongodb
 from command import workflow_command_test
 from command.workflow_command import WorkflowCommand
+from domain import application
+from dsl.type import Err
+
 
 router = APIRouter()
-
-command = WorkflowCommand(repository=workflow_repository.WorkflowRepository())
+command = WorkflowCommand(repository=repository_impl.RepositoryImpl)
 
 
 class Request(BaseModel):
@@ -24,11 +23,11 @@ class Request(BaseModel):
     comment: str = ""
 
 
-@dataclass(eq=False, frozen=True)
 class ResponseApplication(BaseModel, application.Application):
     id_: str
     applicant_id: str
     workflow_id: str
+    route: application.Route
 
     class Config:
         arbitrary_types_allowed = True
@@ -49,8 +48,8 @@ class ResponseApplication(BaseModel, application.Application):
 async def approval(request: Request, actor_id: str = Depends(auth.get_id)):
     # Validation
     try:
-        validated_actor_id = mongodb.ULID(value=actor_id)
-        validated_application_id = mongodb.ULID(value=request.application_id)
+        validated_actor_id = mongodb.ULID(actor_id)
+        validated_application_id = mongodb.ULID(request.application_id)
     except Exception:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 

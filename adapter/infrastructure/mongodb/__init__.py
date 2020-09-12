@@ -5,15 +5,17 @@ ODM:
 Driver:
     motor: https://docs.mongodb.com/drivers/motor
 """
-from typing import TypeVar
+from typing import Awaitable, Callable, TypeVar
 
 import ulid
+import umongo
 from motor.motor_asyncio import AsyncIOMotorClient
-from umongo import Instance
 
+import command
 from adapter import config
 from domain import entity
 
+_T = TypeVar("_T")
 _S = TypeVar("_S")  # Self
 
 
@@ -27,7 +29,7 @@ class ULID(entity.Id, str):
         https://ja.wikipedia.org/wiki/UUID
     """
 
-    def __init__(self: _S,  value: str) -> _S:
+    def __init__(self: _S, value: str) -> _S:
         # Validation
         ulid.from_str(value)
 
@@ -59,11 +61,11 @@ class ULID(entity.Id, str):
         return __class__(ulid.new().str)
 
 
-def _create_connector() -> Instance:
+def _create_connector() -> umongo.Instance:
     uri: str = config["adapter"]["infrastructure"]["mongodb"]["URI"]
     database: str = "enterprise"
     client: AsyncIOMotorClient = AsyncIOMotorClient(uri)
-    return Instance(client[database])
+    return umongo.Instance(client[database])
 
 
 connector = _create_connector()

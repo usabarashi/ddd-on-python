@@ -16,7 +16,7 @@ from domain import entity
 class Employee:
     """DTO
     """
-    id_: str 
+    id_: str
     username: str
     full_name: str
     email_address: str
