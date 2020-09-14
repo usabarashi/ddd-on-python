@@ -12,7 +12,7 @@ class TransactionTraitMock(command.TransactionTrait):
     ) -> Callable[..., Awaitable[_T]]:
         return function
 
-    @ staticmethod
+    @staticmethod
     async def transaction_read_only(
         function: Callable[..., Awaitable[_T]]
     ) -> Callable[..., Awaitable[_T]]:

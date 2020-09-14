@@ -18,13 +18,17 @@ $ pipenv install
 $ pipenv install --dev
 ```
 
+## Setup
+
+```
+$ pipenv run setup
+```
+
 ## Run
 
 ```
 $ pipenv run start 
 ```
-
-## Open API
 
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
