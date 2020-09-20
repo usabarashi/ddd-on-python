@@ -29,13 +29,15 @@
 		"python.linting.mypyPath": "/opt/ddd-on-python/.venv/bin/mypy",
 		"python.linting.pycodestylePath": "/opt/ddd-on-python/.venv/bin/pycodestyle",
 		"python.linting.pydocstylePath": "/opt/ddd-on-python/.venv/bin/pydocstyle",
-		"python.linting.pylintPath": "/opt/ddd-on-python/.venv/bin/pylint",
 		// Formatter
-		"python.formatting.provider": "autopep8",
 		"editor.formatOnSave": true,
-		"python.formatting.autopep8Path": "/opt/ddd-on-python/.venv/bin/autopep8",
+		"python.formatting.provider": "black",
 		"python.formatting.blackPath": "/opt/ddd-on-python/.venv/bin/black",
-		"python.formatting.yapfPath": "/opt/ddd-on-python/.venv/bin/yapf",
+		"[python]": {
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": true
+			}
+		},
 		// Test
 		"python.testing.pytestPath": "/opt/ddd-on-python/.venv/bin/pytest",
 	},
@@ -43,7 +45,7 @@
 	"extensions": [
 		"ms-python.python",
 		"ms-python.vscode-pylance",
-	]
+	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
