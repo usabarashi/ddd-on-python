@@ -6,18 +6,19 @@ see: https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 from datetime import datetime, timedelta
 from typing import Any, Dict, Literal, Optional
 
+from adapter import config
+from adapter.infrastructure.auth import account_dao, token_dao
+from dsl.type import Err, Ok, Result
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from adapter import config
-from adapter.infrastructure.auth import account_dao, token_dao
-from dsl.type import Err, Ok, Result
-
 # to get a string like this run:
 # openssl rand -hex 32
-CREATE_TOKEN_ENDPOINT: str = config["adapter"]["infrastructure"]["auth"]["CREATE_TOKEN_ENDPOINT"]
+CREATE_TOKEN_ENDPOINT: str = config["adapter"]["infrastructure"]["auth"][
+    "CREATE_TOKEN_ENDPOINT"
+]
 SECRET_KEY: str = config["adapter"]["infrastructure"]["auth"]["SECRET_KEY"]
 ALGORITHM: str = config["adapter"]["infrastructure"]["auth"]["ALGORITHM"]
 EXPIRE_MINUTES: int = config["adapter"]["infrastructure"]["auth"]["EXPIRE_MINUTES"]
@@ -25,7 +26,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=CREATE_TOKEN_ENDPOINT)
 
 
-async def authenticate(username: str, password: str) -> Result[Literal[False], account_dao.Account]:
+async def authenticate(
+    username: str, password: str
+) -> Result[Literal[False], account_dao.Account]:
     """認証
     """
     got_account = await account_dao.find(username=username)
@@ -44,8 +47,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def create_token(
-    key: str,
-    expires_delta: Optional[timedelta] = timedelta(minutes=EXPIRE_MINUTES),
+    key: str, expires_delta: Optional[timedelta] = timedelta(minutes=EXPIRE_MINUTES)
 ) -> token_dao.Token:
     """トークン生成
     """

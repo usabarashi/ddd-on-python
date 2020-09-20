@@ -2,19 +2,20 @@
 """
 
 from dataclasses import dataclass
-from domain import entity
-from typing import Iterable, Generator, Optional
+from typing import Generator, Iterable, Optional
 
 import umongo
 from umongo.frameworks.motor_asyncio import MotorAsyncIODocument
 
 from adapter.infrastructure import mongodb
+from domain import entity
 
 
 @dataclass(frozen=True)
 class Workflow:
     """DTO
     """
+
     id_: str
     name: str
     description: str
@@ -40,5 +41,7 @@ async def get(id_: entity.Id) -> Optional[Workflow]:
 
 
 async def find() -> Generator[Workflow, None, None]:
-    got_documents: Iterable[MotorAsyncIODocument] = await WorkflowDocument.find().to_list(length=10)
+    got_documents: Iterable[
+        MotorAsyncIODocument
+    ] = await WorkflowDocument.find().to_list(length=10)
     return (Workflow(**got_document.dump()) for got_document in got_documents)

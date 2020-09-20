@@ -1,4 +1,4 @@
-from dataclasses import dataclass, FrozenInstanceError
+from dataclasses import FrozenInstanceError, dataclass
 from typing import TypeVar
 
 from domain import entity
@@ -8,7 +8,6 @@ _S = TypeVar("_S")
 
 
 class IdMock(entity.Id, str):
-
     def __init__(self: _S, value: str) -> _S:
         str.__init__(value)
 
@@ -54,10 +53,12 @@ def test_create_instance():
 def test_equal():
     created_id = IdMock("create")
     assert created_id == IdMock("create")
-    assert EntityClass(
-        id_=created_id, value="Self") != EntityClass(id_=IdMock("other"), value="Other")
+    assert EntityClass(id_=created_id, value="Self") != EntityClass(
+        id_=IdMock("other"), value="Other"
+    )
     assert EntityClass(id_=created_id, value="Origin") == EntityClass(
-        id_=created_id, value="Modified")
+        id_=created_id, value="Modified"
+    )
 
 
 def test_do_not_allow_destructive_manipulation_of_the_field():
@@ -91,9 +92,11 @@ def test_create_and_return_a_new_instance_in_the_operation_method():
 def test_export_dict():
     created_id = IdMock("create")
     assert {"id_": created_id, "value": ""} == EntityClass(
-        id_=created_id, value="").as_dict()
+        id_=created_id, value=""
+    ).as_dict()
     assert EntityClass(**{"id_": created_id, "value": ""}) == EntityClass(
-        id_=created_id, value="")
+        id_=created_id, value=""
+    )
 
 
 def test_role_object():

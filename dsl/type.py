@@ -1,14 +1,6 @@
 from dataclasses import dataclass
 from functools import reduce
-from typing import (
-    Callable,
-    Generic,
-    Iterable,
-    List,
-    Literal,
-    TypeVar,
-    Union,
-)
+from typing import Callable, Generic, Iterable, List, Literal, Optional, TypeVar, Union
 
 _T = TypeVar("_T")
 _A = TypeVar("_A")
@@ -46,7 +38,7 @@ class ImmutableSequence(List, Generic[_T]):
 
     # Override the list method
 
-    def __init__(self: _S, items: List[_T]) -> _S:
+    def __init__(self: _S, items: Optional[List[_T]]) -> _S:
         if items is None:
             items = list()
         list.__init__(self, items)

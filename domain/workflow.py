@@ -1,11 +1,10 @@
-from typing import TypeVar
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from typing import TypeVar
 
 import domain
-from domain import entity, employee, governance
+from domain import employee, entity, governance
 from dsl.type import Err, Ok, Result
-
 
 _S = TypeVar("_S")
 

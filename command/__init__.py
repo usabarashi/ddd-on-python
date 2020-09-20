@@ -1,6 +1,5 @@
 from typing import Awaitable, Callable, TypeVar
 
-
 _T = TypeVar("_T")
 
 
@@ -11,7 +10,6 @@ async def transaction(
 
 
 class TransactionTrait:
-
     @staticmethod
     async def transaction(
         function: Callable[..., Awaitable[_T]]

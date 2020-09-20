@@ -31,11 +31,10 @@ class WorkflowCommand:
         self, /, *, actor_id: entity.Id, application_id: entity.Id, comment: str
     ) -> Result[application.Error, application.Application]:
         """申請を承認する"""
-
         actor, approve_application, approve_workflow = await self.repository.get(
-            employee_id=actor_id,
-            application_id=application_id
+            employee_id=actor_id, application_id=application_id
         )
+
         if actor is None or approve_application is None or approve_workflow is None:
             raise FileNotFoundError
 
@@ -46,5 +45,7 @@ class WorkflowCommand:
         if isinstance(result, Err):
             return Err(value=result.value)
         else:
-            _, saved_application, _ = await self.repository.save(application_entity=result.value)
+            _, saved_application, _ = await self.repository.save(
+                application_entity=result.value
+            )
             return Ok(value=saved_application)

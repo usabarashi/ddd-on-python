@@ -14,7 +14,6 @@ Trial and error of DDD on Python.
 1. Set up the environment inside the container. Using VSCode's Remote Container.
 
 ```
-$ pipenv install
 $ pipenv install --dev
 ```
 

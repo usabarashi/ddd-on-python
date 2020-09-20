@@ -16,6 +16,7 @@ from domain import entity
 class Employee:
     """DTO
     """
+
     id_: str
     username: str
     full_name: str
@@ -51,5 +52,7 @@ async def get(id_: entity.Id) -> Optional[Employee]:
 
 
 async def find() -> Generator[Employee, None, None]:
-    got_documents: Iterable[MotorAsyncIODocument] = await EmployeeDocument.find().to_list(length=10)
+    got_documents: Iterable[
+        MotorAsyncIODocument
+    ] = await EmployeeDocument.find().to_list(length=10)
     return (Employee(**got_document.dump()) for got_document in got_documents)

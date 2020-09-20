@@ -1,7 +1,7 @@
 from dataclasses import asdict, dataclass, field
 from typing import Generic, Literal, TypeVar
 
-from dsl.type import Err, Ok, Result, ImmutableSequence
+from dsl.type import Err, ImmutableSequence, Ok, Result
 
 _T = TypeVar("_T")
 
@@ -240,8 +240,7 @@ def test_immutable_sequence_map():
 
 def test_immutable_sequence_redece():
     sequence = ImmutableSequence([0, 1, 2])
-    reduced_sequence = sequence.reduce(
-        function=lambda left, right: left * right)
+    reduced_sequence = sequence.reduce(function=lambda left, right: left * right)
     assert reduced_sequence is not sequence
     assert 0 == reduced_sequence
 
@@ -249,8 +248,7 @@ def test_immutable_sequence_redece():
 def test_immutable_sequence_dataclass():
     @dataclass(frozen=True)
     class SeqEntity(Generic[_T]):
-        value: ImmutableSequence[_T] = field(
-            default_factory=ImmutableSequence[_T])
+        value: ImmutableSequence[_T] = field(default_factory=ImmutableSequence[_T])
 
     entity = SeqEntity(value=ImmutableSequence())
     dict_entity = asdict(entity)

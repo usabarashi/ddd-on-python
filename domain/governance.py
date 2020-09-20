@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from enum import IntEnum
 from datetime import datetime
+from enum import IntEnum
 from typing import TypeVar
 
 _T = TypeVar("_T")

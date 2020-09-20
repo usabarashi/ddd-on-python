@@ -2,8 +2,16 @@ import asyncio
 from typing import Optional, Tuple
 
 from command import workflow_command
-from domain import application, entity, entity_test, employee, governance, repository, workflow
-from dsl.type import Err, Ok, ImmutableSequence
+from domain import (
+    application,
+    employee,
+    entity,
+    entity_test,
+    governance,
+    repository,
+    workflow,
+)
+from dsl.type import Err, ImmutableSequence, Ok
 
 
 class Test承認:
@@ -25,12 +33,11 @@ class Test承認:
             class RepositoryMock(repository.Repository):
                 @staticmethod
                 async def get(
-                    employee_id: entity.Id,
-                    application_id: entity.Id
+                    employee_id: entity.Id, application_id: entity.Id
                 ) -> Tuple[
                     Optional[employee.Employee],
                     Optional[application.Application],
-                    Optional[workflow.Workflow]
+                    Optional[workflow.Workflow],
                 ]:
                     employee_entity = employee.Employee(
                         id_=employee_id,
@@ -51,7 +58,8 @@ class Test承認:
                         applicant_id=applicant_id,
                         workflow_id=workflow_id,
                         route=application.Route(
-                            [application.Progress(approver_id=actor_id)]),
+                            [application.Progress(approver_id=actor_id)]
+                        ),
                     )
 
                     workflow_entity = workflow.Workflow(
@@ -71,16 +79,16 @@ class Test承認:
                 ) -> Tuple[
                     Optional[employee.Employee],
                     Optional[application.Application],
-                    Optional[workflow.Workflow]
+                    Optional[workflow.Workflow],
                 ]:
                     return employee_entity, application_entity, workflow_entity
 
-            command = workflow_command.WorkflowCommand(
-                repository=RepositoryMock)
+            command = workflow_command.WorkflowCommand(repository=RepositoryMock)
 
             result = asyncio.run(
-                command.approval(actor_id=actor_id,
-                                 application_id=application_id, comment="test")
+                command.approval(
+                    actor_id=actor_id, application_id=application_id, comment="test"
+                )
             )
             assert Ok is type(result)
 
@@ -95,12 +103,11 @@ class Test承認:
             class RepositoryMock(repository.Repository):
                 @staticmethod
                 async def get(
-                    employee_id: entity.Id,
-                    application_id: entity.Id
+                    employee_id: entity.Id, application_id: entity.Id
                 ) -> Tuple[
                     Optional[employee.Employee],
                     Optional[application.Application],
-                    Optional[workflow.Workflow]
+                    Optional[workflow.Workflow],
                 ]:
                     employee_entity = employee.Employee(
                         id_=employee_id,
@@ -117,7 +124,7 @@ class Test承認:
                     application_entity = application.Application(
                         id_=application_id,
                         applicant_id=application_id,
-                        workflow_id=workflow_id
+                        workflow_id=workflow_id,
                     )
 
                     workflow_entity = workflow.Workflow(
@@ -137,17 +144,16 @@ class Test承認:
                 ) -> Tuple[
                     Optional[employee.Employee],
                     Optional[application.Application],
-                    Optional[workflow.Workflow]
+                    Optional[workflow.Workflow],
                 ]:
                     return employee_entity, application_entity, workflow_entity
 
-            command = workflow_command.WorkflowCommand(
-                repository=RepositoryMock)
+            command = workflow_command.WorkflowCommand(repository=RepositoryMock)
 
-            result = asyncio.run(command.approval(
-                actor_id=actor_id,
-                application_id=application_id,
-                comment="test"
-            ))
+            result = asyncio.run(
+                command.approval(
+                    actor_id=actor_id, application_id=application_id, comment="test"
+                )
+            )
             assert Err is type(result)
             assert isinstance(result.value, application.NoJobAuthorityError)

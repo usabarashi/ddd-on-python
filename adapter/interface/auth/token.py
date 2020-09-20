@@ -53,5 +53,7 @@ async def create_token(request: OAuth2PasswordRequestForm = Depends()):
         )
     else:
         authed_account = auth_result.value
-        created_token = await auth.create_token(key=authed_account.id_, expires_delta=None)
+        created_token = await auth.create_token(
+            key=authed_account.id_, expires_delta=None
+        )
         return ResponseToken(**asdict(created_token))

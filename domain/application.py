@@ -1,11 +1,11 @@
-from enum import IntEnum
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import IntEnum
 from typing import List, Optional, TypeVar
 
 import domain
-from domain import entity, employee, workflow
-from dsl.type import ImmutableSequence, Err, Ok, Result
+from domain import employee, entity, workflow
+from dsl.type import Err, ImmutableSequence, Ok, Result
 
 _S = TypeVar("_S")
 
@@ -82,8 +82,7 @@ class Application(entity.Entity):
     def process(self: _S, approver: employee.Employee, comment: str) -> _S:
         """処理する"""
         return self._update(
-            route=self.route.progress_approve(
-                approver=approver, comment=comment)
+            route=self.route.progress_approve(approver=approver, comment=comment)
         )
 
 

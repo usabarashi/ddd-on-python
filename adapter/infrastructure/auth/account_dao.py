@@ -13,6 +13,7 @@ from adapter.infrastructure.mongodb.dao import employee_dao
 class Account:
     """DTO
     """
+
     id_: str
     username: str
     hashed_password: str
@@ -21,10 +22,9 @@ class Account:
 async def get(id_: str) -> Optional[Account]:
     """アクティブアカウントを取得する
     """
-    got_document = await employee_dao.EmployeeDocument.find_one(filter={
-        "_id": id_,
-        "disabled": False,
-    })
+    got_document = await employee_dao.EmployeeDocument.find_one(
+        filter={"_id": id_, "disabled": False}
+    )
 
     if got_document is None:
         return None
@@ -33,16 +33,16 @@ async def get(id_: str) -> Optional[Account]:
     return Account(
         id_=str(got_employee.id_),
         username=got_employee.username,
-        hashed_password=got_employee.hashed_password)
+        hashed_password=got_employee.hashed_password,
+    )
 
 
 async def find(username: str) -> Optional[Account]:
     """アクティブアカウントを取得する
     """
-    got_document = await employee_dao.EmployeeDocument.find_one(filter={
-        "username": username,
-        "disabled": False,
-    })
+    got_document = await employee_dao.EmployeeDocument.find_one(
+        filter={"username": username, "disabled": False}
+    )
 
     if got_document is None:
         return None
@@ -51,4 +51,5 @@ async def find(username: str) -> Optional[Account]:
     return Account(
         id_=str(got_employee.id_),
         username=got_employee.username,
-        hashed_password=got_employee.hashed_password)
+        hashed_password=got_employee.hashed_password,
+    )

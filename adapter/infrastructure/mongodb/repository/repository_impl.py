@@ -2,8 +2,8 @@ from typing import Optional, Tuple
 
 from adapter.infrastructure import mongodb
 from adapter.infrastructure.mongodb.dao import (
-    employee_dao,
     application_dao,
+    employee_dao,
     workflow_dao,
 )
 from domain import application, employee, entity, governance, repository, workflow

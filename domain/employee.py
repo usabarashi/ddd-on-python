@@ -11,6 +11,7 @@ _S = TypeVar("_S")
 @dataclass(eq=False, frozen=True)
 class Employee(entity.Entity):
     """社員"""
+
     id_: entity.Id
     username: str
     full_name: str

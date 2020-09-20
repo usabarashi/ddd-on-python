@@ -4,15 +4,15 @@ from dataclasses import asdict, dataclass
 from typing import Generator, Iterable, Optional
 
 import umongo
-from umongo.frameworks.motor_asyncio import MotorAsyncIODocument
-
 from adapter.infrastructure import mongodb
+from umongo.frameworks.motor_asyncio import MotorAsyncIODocument
 
 
 @dataclass(frozen=True)
 class Token:
     """DTO
     """
+
     access_token: str
     token_type: str
 
@@ -38,7 +38,9 @@ async def get(access_token: str) -> Optional[Token]:
 
 
 async def find() -> Generator[Token, None, None]:
-    got_documents: Iterable[MotorAsyncIODocument] = await TokenDAO.find().to_list(length=10)
+    got_documents: Iterable[MotorAsyncIODocument] = await TokenDAO.find().to_list(
+        length=10
+    )
     for got_document in got_documents:
         got_dict = got_document.dump()
         del got_dict["id"]

@@ -1,8 +1,8 @@
 """Me
 """
 
-from datetime import datetime
 from dataclasses import asdict
+from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -36,9 +36,7 @@ class ResponseAccount(BaseModel, employee_dao.Employee):
     summary="",
     description="",
 )
-async def get_account(
-    actor_id: str = Depends(auth.get_id),
-):
+async def get_account(actor_id: str = Depends(auth.get_id),):
     got_employee = await account.get_account(id_=mongodb.ULID(value=actor_id))
     if got_employee is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)

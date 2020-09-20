@@ -4,7 +4,11 @@ import asyncio
 from datetime import datetime
 
 from adapter.infrastructure import mongodb
-from adapter.infrastructure.mongodb.dao import application_dao, employee_dao, workflow_dao
+from adapter.infrastructure.mongodb.dao import (
+    application_dao,
+    employee_dao,
+    workflow_dao,
+)
 from domain import application, employee, governance, workflow
 from dsl.type import ImmutableSequence
 
@@ -29,8 +33,7 @@ async def insert_user():
         username="johndoe",
         full_name="John Doe",
         email_address="johndoe@example.com",
-        duties=ImmutableSequence(
-            [governance.Duties.MANAGEMENT_DEPARTMENT]),
+        duties=ImmutableSequence([governance.Duties.MANAGEMENT_DEPARTMENT]),
         join_date=datetime.now(),
         retirement_date=None,
         # plain_password="password",
@@ -45,10 +48,10 @@ async def insert_application():
         id_=application_id,
         applicant_id=employee_id,
         workflow_id=workflow_id,
-        route=application.Route(
-            [application.Progress(approver_id=employee_id)]),
+        route=application.Route([application.Progress(approver_id=employee_id)]),
     )
     await application_dao.ApplicationDocument(**entity.as_dict()).commit()
+
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(insert_workflow())
