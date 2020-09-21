@@ -7,10 +7,10 @@ verify_ssl = true
 bandit = "1.6.2"
 black = "==19.10b0"
 flake8 = "3.8.3"
+isort = "*"
 mypy = "0.783"
 pytest = "5.4.3"
 pytest-asyncio = "*"
-isort = "*"
 
 [packages]
 fastapi = "0.59.3"

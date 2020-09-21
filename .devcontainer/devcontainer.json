@@ -24,19 +24,19 @@
 		},
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.pythonPath": "${workspaceFolder}/.venv/bin/python",
-		// Linter
+		// Linter: https://code.visualstudio.com/docs/python/linting
 		"python.linting.enabled": true,
-		"python.linting.flake8Enabled": true,
 		"python.linting.pylintEnabled": false,
-		"python.linting.banditPath": "${workspaceFolder}/.venv/bin/bandit",
+		"python.linting.flake8Enabled": true,
 		"python.linting.flake8Path": "${workspaceFolder}/.venv/bin/flake8",
 		"python.linting.flake8Args": [
-			"--max-line-length=100",
+			"--max-line-length=100"
 		],
+		"python.linting.banditEnabled": true,
+		"python.linting.banditPath": "${workspaceFolder}/.venv/bin/bandit",
 		"python.analysis.typeCheckingMode": "basic",
+		"python.linting.mypyEnabled": true,
 		"python.linting.mypyPath": "${workspaceFolder}/.venv/bin/mypy",
-		"python.linting.pycodestylePath": "${workspaceFolder}/.venv/bin/pycodestyle",
-		"python.linting.pydocstylePath": "${workspaceFolder}/.venv/bin/pydocstyle",
 		"python.linting.lintOnSave": true,
 		// Formatter
 		"python.formatting.provider": "black",
