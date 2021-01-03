@@ -10,7 +10,7 @@ from adapter.infrastructure.mongodb.dao import (
     workflow_dao,
 )
 from domain import application, employee, governance, workflow
-from dsl.type import ImmutableSequence
+from dsl.type import Vector
 
 workflow_id = mongodb.ULID.generate()
 employee_id = mongodb.ULID.generate()
@@ -33,7 +33,7 @@ async def insert_user():
         username="johndoe",
         full_name="John Doe",
         email_address="johndoe@example.com",
-        duties=ImmutableSequence([governance.Duties.MANAGEMENT_DEPARTMENT]),
+        duties=Vector([governance.Duties.MANAGEMENT_DEPARTMENT]),
         join_date=datetime.now(),
         retirement_date=None,
         # plain_password="password",

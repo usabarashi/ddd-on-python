@@ -1,32 +1,32 @@
-from dataclasses import FrozenInstanceError, dataclass
-from typing import TypeVar
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from dsl.type import Vector
 
 from domain import entity
-from dsl.type import ImmutableSequence
-
-_S = TypeVar("_S")
 
 
 class IdMock(entity.Id, str):
-    def __init__(self: _S, value: str) -> _S:
+    def __init__(self, value: str):
         str.__init__(value)
 
-    def __eq__(self: _S, other: _S) -> bool:
+    def __eq__(self, other: IdMock) -> bool:
         return str(self) == str(other)
 
-    def __ne__(self: _S, other: _S) -> bool:
+    def __ne__(self, other: IdMock) -> bool:
         return str(self) != str(other)
 
-    def __lt__(self: _S, other: _S) -> bool:
+    def __lt__(self, other: IdMock) -> bool:
         return str(self) < str(other)
 
-    def __le__(self: _S, other: _S) -> bool:
+    def __le__(self, other: IdMock) -> bool:
         return str(self) <= str(other)
 
-    def __gt__(self: _S, other: _S) -> bool:
+    def __gt__(self, other: IdMock) -> bool:
         return str(self) > str(other)
 
-    def __ge__(self: _S, other: _S) -> bool:
+    def __ge__(self, other: IdMock) -> bool:
         return str(self) >= str(other)
 
     @classmethod
@@ -39,7 +39,7 @@ class EntityClass(entity.Entity):
     id_: entity.Id
     value: str = ""
 
-    def modify_value(self, value: str):
+    def modify_value(self, value: str) -> EntityClass:
         processed_value = value
         return self._update(value=processed_value)
 
@@ -62,12 +62,14 @@ def test_equal():
 
 
 def test_do_not_allow_destructive_manipulation_of_the_field():
-    try:
-        crated_entity = EntityClass(id_=IdMock("create"), value="")
-        crated_entity.value = "Mutated!!"
-        assert False
-    except FrozenInstanceError:
-        assert True
+    # Syntax Error
+    # try:
+    #     crated_entity = EntityClass(id_=IdMock("create"), value="")
+    #     crated_entity.value = "Mutated!!"
+    #     assert False
+    # except FrozenInstanceError:
+    #     assert True
+
     # Syntax Error
     # try:
     #    _ = EntityClass(id=1, value="", mutated="")
@@ -102,7 +104,7 @@ def test_export_dict():
 def test_role_object():
     @dataclass(eq=False, frozen=True)
     class Role(EntityClass):
-        def role_method(self) -> entity.Id:
+        def role_method(self):
             return self.id_
 
     created_id = IdMock("create")
@@ -112,7 +114,7 @@ def test_role_object():
     assert created_entity == roled_entity
     assert created_id == roled_entity.role_method()
     try:
-        _ = created_entity.as_role(ImmutableSequence)
+        _ = created_entity.as_role(Vector)
         assert False
     except TypeError:
         assert True

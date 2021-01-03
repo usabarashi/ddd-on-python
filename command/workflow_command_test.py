@@ -1,7 +1,6 @@
 import asyncio
 from typing import Optional, Tuple
 
-from command import workflow_command
 from domain import (
     application,
     employee,
@@ -11,7 +10,9 @@ from domain import (
     repository,
     workflow,
 )
-from dsl.type import Err, ImmutableSequence, Ok
+from dsl.type import Err, Ok, Vector
+
+from command import workflow_command
 
 
 class Test承認:
@@ -44,9 +45,7 @@ class Test承認:
                         username="test",
                         full_name="test",
                         email_address="test",
-                        duties=ImmutableSequence(
-                            [governance.Duties.MANAGEMENT_DEPARTMENT]
-                        ),
+                        duties=Vector([governance.Duties.MANAGEMENT_DEPARTMENT]),
                         join_date=None,
                         retirement_date=None,
                         hashed_password="",
@@ -114,7 +113,7 @@ class Test承認:
                         username="test_employee",
                         full_name="test",
                         email_address="test_mail_address",
-                        duties=ImmutableSequence([]),
+                        duties=Vector([]),
                         join_date=None,
                         retirement_date=None,
                         hashed_password="",

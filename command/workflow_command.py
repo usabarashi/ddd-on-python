@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import Type, TypeVar
 
 from domain import application, entity, repository
-from dsl.type import Err, Ok, Result
+from dsl.type import Err, Ok
 
 _T = TypeVar("_T")
 
@@ -29,8 +29,9 @@ class WorkflowCommand:
 
     async def approval(
         self, /, *, actor_id: entity.Id, application_id: entity.Id, comment: str
-    ) -> Result[application.Error, application.Application]:
+    ):
         """申請を承認する"""
+
         actor, approve_application, approve_workflow = await self.repository.get(
             employee_id=actor_id, application_id=application_id
         )

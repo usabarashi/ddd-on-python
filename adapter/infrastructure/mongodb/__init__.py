@@ -9,11 +9,9 @@ from typing import Awaitable, Callable, TypeVar
 
 import ulid
 import umongo
-from motor.motor_asyncio import AsyncIOMotorClient
-
-import command
 from adapter import config
 from domain import entity
+from motor.motor_asyncio import AsyncIOMotorClient
 
 _T = TypeVar("_T")
 _S = TypeVar("_S")  # Self
@@ -65,7 +63,31 @@ def _create_connector() -> umongo.Instance:
     uri: str = config["adapter"]["infrastructure"]["mongodb"]["URI"]
     database: str = "enterprise"
     client: AsyncIOMotorClient = AsyncIOMotorClient(uri)
-    return umongo.Instance(client[database])
+    return umongo.Instance(db=client[database])
 
 
 connector = _create_connector()
+
+
+class DataStoreTrait:
+    @staticmethod
+    async def transaction(
+        function: Callable[..., Awaitable[_T]]
+    ) -> Callable[..., Awaitable[_T]]:
+        async def wrapper(*args, **kwargs) -> Awaitable[_T]:
+            async with await connector.db.start_session() as session:
+                async with session.start_transaction():
+                    return await function()
+
+        return wrapper
+
+    @staticmethod
+    async def transaction_read_only(
+        function: Callable[..., Awaitable[_T]]
+    ) -> Callable[..., Awaitable[_T]]:
+        async def wrapper(*args, **kwargs) -> Awaitable[_T]:
+            async with await connector.db.start_session() as session:
+                async with session.start_transaction():
+                    return await function()
+
+        return wrapper

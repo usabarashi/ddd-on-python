@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from functools import reduce
-from typing import Callable, Generic, Iterable, List, Literal, Optional, TypeVar, Union
+from typing import (Callable, Generic, Iterable, List, Literal, Optional,
+                    Tuple, TypeVar, Union)
 
 _T = TypeVar("_T")
 _A = TypeVar("_A")
@@ -34,16 +37,17 @@ class Ok(Generic[_T]):
 Result = Union[Err[_E], Ok[_T]]
 
 
-class ImmutableSequence(List, Generic[_T]):
+class Vector(List, Generic[_T]):
 
     # Override the list method
 
-    def __init__(self: _S, items: Optional[List[_T]]) -> _S:
+    # FIXME: delete Tuple[()]
+    def __init__(self, items: Optional[Union[List[_T], Tuple[_T], Tuple[()]]] = None):
         if items is None:
             items = list()
         list.__init__(self, items)
 
-    def __add__(self: _S, other: List[_T]) -> _S:
+    def __add__(self, other: List[_T]):
         sequence = list(self)
         return __class__(sequence.__add__(other))
 
@@ -53,27 +57,27 @@ class ImmutableSequence(List, Generic[_T]):
     def __delitem__(self, slice_: slice) -> None:
         raise TypeError("Does not support the __delitem__ method")
 
-    def append(self: _S, obj: _T) -> _S:
+    def append(self, obj: _T):
         sequence = list(self)
         sequence.append(obj)
         return __class__(sequence)
 
-    def extend(self: _S, items: Iterable[_T]) -> _S:
+    def extend(self, items: Iterable[_T]):
         sequence = list(self)
         sequence.extend(items)
         return __class__(sequence)
 
-    def insert(self: _S, index: int, obj: _T) -> _S:
+    def insert(self, index: int, obj: _T):
         sequence = list(self)
         sequence.insert(index, obj)
         return __class__(sequence)
 
-    def remove(self: _S, obj: _T) -> _S:
+    def remove(self, obj: _T):
         sequence = list(self)
         sequence.remove(obj)
         return __class__(sequence)
 
-    def pop(self: _S, index: int) -> _S:
+    def pop(self, index: int):
         sequence = list(self)
         sequence.pop(index)
         return __class__(sequence)
@@ -81,23 +85,25 @@ class ImmutableSequence(List, Generic[_T]):
     def clear(self: _S) -> None:
         raise TypeError("Does not support the clear method")
 
-    def index(self: _S, obj: _T, start: int, end: int) -> int:
+    def index(self, obj: _T, start: int, end: int) -> int:
         return list.index(self, obj, start, end)
 
-    def count(self: _S, obj: _T) -> int:
+    def count(self, obj: _T) -> int:
         return list.count(self, obj)
 
-    def sort(self: _S, *, key: None = None, reverse: bool = False,) -> _S:
+    def sort(
+        self, *, key: None = None, reverse: bool = False,
+    ):
         sequence = list(self)
         sequence.sort(key=key, reverse=reverse)
         return __class__(sequence)
 
-    def reverse(self: _S) -> _S:
+    def reverse(self):
         sequence = list(self)
         sequence.reverse()
         return __class__(sequence)
 
-    def copy(self: _S) -> _S:
+    def copy(self):
         return __class__(list(self))
 
     # Add functional method
@@ -111,11 +117,11 @@ class ImmutableSequence(List, Generic[_T]):
     def size(self) -> int:
         return len(self)
 
-    def map(self: _S, /, *, function: Callable[[_T], _A]) -> _B:
+    def map(self, /, *, function: Callable[[_T], _A]):
         return __class__([function(element) for element in self])
 
-    def reduce(self: _S, /, *, function: Callable[[_T, _T], _T]) -> _T:
+    def reduce(self, /, *, function: Callable[[_T, _T], _T]):
         return reduce(function, self)
 
-    def filter(self: _S, /, *, function: Callable[[_T], bool]) -> _S:
+    def filter(self, /, *, function: Callable[[_T], bool]):
         return __class__([element for element in self if function(element)])

@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import TypeVar
 
-import domain
+from dsl.type import Err, Ok
+
 from domain import employee, entity, governance
-from dsl.type import Err, Ok, Result
 
 _S = TypeVar("_S")
 
@@ -41,20 +41,26 @@ class Workflow(entity.Entity):
     description: str
     duties: governance.Duties = governance.Duties.MANAGEMENT_DEPARTMENT
 
-    @staticmethod
+    @classmethod
     def create_template(
-        id_: entity.Id, name: str, description: str, duties: governance.Duties
-    ) -> _S:
+        cls, id_: entity.Id, name: str, description: str, duties: governance.Duties
+    ):
         """Factory method"""
-        return __class__(id_=id_, name=name, description=description, duties=duties)
+        return cls(id_=id_, name=name, description=description, duties=duties)
 
 
 class ManagerRole(employee.Employee):
     """部門管理者ロール"""
 
     def create(
-        self, /, *, id_: entity.Id, name: str, description: str, duties: governance.Duties
-    ) -> Result[domain.Error, Workflow]:
+        self,
+        /,
+        *,
+        id_: entity.Id,
+        name: str,
+        description: str,
+        duties: governance.Duties,
+    ):
         """ワークフローを新規作成する"""
 
         if not name:
@@ -66,9 +72,7 @@ class ManagerRole(employee.Employee):
 
         return Ok(Workflow(id_=id_, name=name, description=description, duties=duties))
 
-    def edit(
-        self, /, *, workflow: Workflow, name=None, description=None, duties=None
-    ) -> Result[Error, Workflow]:
+    def edit(self, /, *, workflow: Workflow, name=None, description=None, duties=None):
         """ワークフローを編集する
         FIXME: 申請済がある場合はどうする？
         """

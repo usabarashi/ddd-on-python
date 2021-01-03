@@ -2,9 +2,10 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import Generic, TypeVar
 
+from dsl.type import Err, Ok, Result, Vector
+
 import domain
 from domain import employee, governance
-from dsl.type import Err, ImmutableSequence, Ok, Result
 
 _T = TypeVar("_T")
 
@@ -14,9 +15,9 @@ class Confidential(Generic[_T]):
     """機密"""
 
     value: _T
-    viewable_duties: ImmutableSequence[governance.Duties]
+    viewable_duties: Vector[governance.Duties]
 
-    def visible(self, duties: ImmutableSequence[governance.Duties]) -> bool:
+    def visible(self, duties: Vector[governance.Duties]) -> bool:
         """閲覧可否を判定する"""
         return reduce(
             function=lambda left, right: left or right,
@@ -26,7 +27,7 @@ class Confidential(Generic[_T]):
             initial=False,
         )
 
-    def get(self, duties: ImmutableSequence[governance.Duties]) -> _T:
+    def get(self, duties: Vector[governance.Duties]) -> _T:
         """閲覧する"""
         if self.visible(duties=duties):
             return self.value

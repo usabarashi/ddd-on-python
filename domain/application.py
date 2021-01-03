@@ -1,11 +1,14 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import IntEnum
 from typing import List, Optional, TypeVar
 
+from dsl.type import Err, Ok, Result, Vector
+
 import domain
 from domain import employee, entity, workflow
-from dsl.type import Err, ImmutableSequence, Ok, Result
 
 _S = TypeVar("_S")
 
@@ -25,13 +28,13 @@ class Progress:
     comment: Optional[str] = field(default=None)
 
 
-class Route(ImmutableSequence[Progress]):
+class Route(Vector[Progress]):
     """承認経路"""
 
     def __init__(self, sequence: List[Progress] = None):
         if sequence is None:
             sequence = []
-        ImmutableSequence.__init__(self, sequence)
+        Vector.__init__(self, sequence)
 
     def is_complete(self) -> bool:
         """決済の有無"""
@@ -58,7 +61,7 @@ class Route(ImmutableSequence[Progress]):
             ).size()
         )
 
-    def progress_approve(self: _S, approver: employee.Employee, comment: str) -> _S:
+    def progress_approve(self, approver: employee.Employee, comment: str):
         """承認を追加する"""
         return self.map(
             function=lambda progress: Progress(
@@ -79,7 +82,7 @@ class Application(entity.Entity):
     workflow_id: entity.Id
     route: Route = field(default_factory=Route)
 
-    def process(self: _S, approver: employee.Employee, comment: str) -> _S:
+    def process(self, approver: employee.Employee, comment: str):
         """処理する"""
         return self._update(
             route=self.route.progress_approve(approver=approver, comment=comment)
@@ -123,7 +126,7 @@ class ApproverRole(employee.Employee):
             return True
 
     def approval(
-        self: _S, application: Application, workflow: workflow.Workflow, comment: str
+        self, application: Application, workflow: workflow.Workflow, comment: str
     ) -> Result[Error, Application]:
         """承認する"""
         if workflow.duties not in self.duties:

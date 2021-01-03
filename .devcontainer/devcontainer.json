@@ -34,9 +34,15 @@
 		],
 		"python.linting.banditEnabled": true,
 		"python.linting.banditPath": "${workspaceFolder}/.venv/bin/bandit",
-		"python.analysis.typeCheckingMode": "basic",
+		"python.analysis.typeCheckingMode": "strict",
 		"python.linting.mypyEnabled": true,
 		"python.linting.mypyPath": "${workspaceFolder}/.venv/bin/mypy",
+		"python.linting.mypyArgs": [
+			"--ignore-missing-imports",
+			"--follow-imports=silent",
+			"--show-column-numbers",
+			"--check-untyped-defs"
+		],
 		"python.linting.lintOnSave": true,
 		// Formatter
 		"python.formatting.provider": "black",
