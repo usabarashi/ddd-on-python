@@ -1,0 +1,43 @@
+version: "3"
+services:
+
+  backend:
+    build:
+      context: builds/backend
+    image: usabarashi/ddd-on-python:yyyymmmdd
+    container_name: backend 
+    hostname: backend 
+    environment:
+      TZ: "Asia/Tokyo"
+    command: tail -f /dev/null
+    volumes:
+      - ../:/opt/ddd-on-python
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - 8000 # HTTP
+    ports:
+      - 8000:8000
+
+  datastore:
+    image: mongo:3.6-xenial 
+    container_name: datastore 
+    hostname: datastore 
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password 
+    expose:
+      - 27017
+    restart: always
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express 
+    hostname: mongo-express 
+    environment:
+      ME_CONFIG_MONGODB_SERVER: datastore
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password 
+    ports:
+      - 8081:8081
+    restart: always

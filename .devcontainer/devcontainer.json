@@ -3,7 +3,7 @@
 {
 	"name": "DDD on Python",
 	"dockerComposeFile": [
-		"../../container/docker-compose.yml"
+		"../container/docker-compose.yml"
 	],
 	"service": "backend",
 	"workspaceFolder": "/opt/ddd-on-python",
@@ -23,20 +23,20 @@
 			},
 		},
 		"terminal.integrated.shell.linux": "/bin/bash",
-		"python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+		"python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python",
 		// Linter: https://code.visualstudio.com/docs/python/linting
 		"python.linting.enabled": true,
 		"python.linting.pylintEnabled": false,
 		"python.linting.flake8Enabled": true,
-		"python.linting.flake8Path": "${workspaceFolder}/.venv/bin/flake8",
+		"python.linting.flake8Path": "${workspaceFolder}/backend/.venv/bin/flake8",
 		"python.linting.flake8Args": [
 			"--max-line-length=100"
 		],
 		"python.linting.banditEnabled": true,
-		"python.linting.banditPath": "${workspaceFolder}/.venv/bin/bandit",
+		"python.linting.banditPath": "${workspaceFolder}/backend/.venv/bin/bandit",
 		"python.analysis.typeCheckingMode": "strict",
 		"python.linting.mypyEnabled": true,
-		"python.linting.mypyPath": "${workspaceFolder}/.venv/bin/mypy",
+		"python.linting.mypyPath": "${workspaceFolder}/backend/.venv/bin/mypy",
 		"python.linting.mypyArgs": [
 			"--ignore-missing-imports",
 			"--follow-imports=silent",
@@ -46,10 +46,10 @@
 		"python.linting.lintOnSave": true,
 		// Formatter
 		"python.formatting.provider": "black",
-		"python.formatting.blackPath": "${workspaceFolder}/.venv/bin/black",
-		"python.sortImports.path": "${workspaceFolder}/.venv/bin/isort",
+		"python.formatting.blackPath": "${workspaceFolder}/backend/.venv/bin/black",
+		"python.sortImports.path": "${workspaceFolder}/backend/.venv/bin/isort",
 		// Test
-		"python.testing.pytestPath": "${workspaceFolder}/.venv/bin/pytest",
+		"python.testing.pytestPath": "${workspaceFolder}/backend/.venv/bin/pytest",
 	},
 	"extensions": [
 		"ms-python.python",
