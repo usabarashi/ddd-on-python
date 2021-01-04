@@ -8,7 +8,7 @@
 	"service": "backend",
 	"workspaceFolder": "/opt/ddd-on-python",
 	"remoteEnv": {
-		"PYTHONPATH": "/opt/ddd-on-python",
+		"PYTHONPATH": "/opt/ddd-on-python/backend",
 		"PIPENV_VENV_IN_PROJECT": "1",
 	},
 	"settings": {
@@ -24,6 +24,9 @@
 		},
 		"terminal.integrated.shell.linux": "/bin/bash",
 		"python.pythonPath": "${workspaceFolder}/backend/.venv/bin/python",
+		"python.analysis.extraPaths": [
+			"/opt/ddd-on-python/backend"
+		],
 		// Linter: https://code.visualstudio.com/docs/python/linting
 		"python.linting.enabled": true,
 		"python.linting.pylintEnabled": false,
@@ -35,7 +38,7 @@
 		"python.linting.banditEnabled": true,
 		"python.linting.banditPath": "${workspaceFolder}/backend/.venv/bin/bandit",
 		"python.analysis.typeCheckingMode": "strict",
-		"python.linting.mypyEnabled": true,
+		"python.linting.mypyEnabled": false,
 		"python.linting.mypyPath": "${workspaceFolder}/backend/.venv/bin/mypy",
 		"python.linting.mypyArgs": [
 			"--ignore-missing-imports",
@@ -43,6 +46,8 @@
 			"--show-column-numbers",
 			"--check-untyped-defs"
 		],
+		"python.linting.pycodestylePath": "/usr/local/py-utils/bin/pycodestyle",
+		"python.linting.pydocstylePath": "/usr/local/py-utils/bin/pydocstyle",
 		"python.linting.lintOnSave": true,
 		// Formatter
 		"python.formatting.provider": "black",

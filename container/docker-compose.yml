@@ -4,6 +4,10 @@ services:
   backend:
     build:
       context: builds/backend
+      args: 
+        VARIANT: "3.9"
+        INSTALL_NODE: "true"
+        NODE_VERSION: "lts/*"
     image: usabarashi/ddd-on-python:yyyymmmdd
     container_name: backend 
     hostname: backend 
