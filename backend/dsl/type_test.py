@@ -1,5 +1,5 @@
 from dataclasses import asdict, dataclass, field
-from typing import Generic, Literal, TypeVar
+from typing import Any, Generic, Literal, TypeVar
 
 from dsl.type import Err, Ok, Result, Vector
 
@@ -9,7 +9,7 @@ _T = TypeVar("_T")
 
 
 def test_result_Ok():
-    def result(x) -> Result[Literal["Err"], Literal["Ok"]]:
+    def result(x: bool) -> Result[Literal["Err"], Literal["Ok"]]:
         return Ok("Ok") if x else Err("Err")
 
     assert result(True)
@@ -18,7 +18,7 @@ def test_result_Ok():
 
 
 def test_result_Err():
-    def result(x) -> Result[Literal["Err"], Literal["Ok"]]:
+    def result(x: bool) -> Result[Literal["Err"], Literal["Ok"]]:
         return Ok("Ok") if x else Err("Err")
 
     assert not result(False)
@@ -27,7 +27,7 @@ def test_result_Err():
 
 
 def test_result_fold():
-    def result(x) -> Result[Literal["Err"], Literal["Ok"]]:
+    def result(x: bool) -> Result[Literal["Err"], Literal["Ok"]]:
         return Ok("Ok") if x else Err("Err")
 
     assert "Ok" == result(True).fold(err=lambda x: None, ok=lambda x: x)
@@ -74,17 +74,17 @@ def test_immutable_sequence_add():
     assert ii_collection != other_collection
 
 
-def test_immutable_sequence_add_warning_case():
-    # mutable + immutable
-    collection = Vector([0, 1, 2])
-    mi_collection = [3] + collection
-    assert mi_collection is not collection
-    assert not isinstance(mi_collection, Vector)
-    assert isinstance(mi_collection, list)
-    assert [3, 0, 1, 2] == mi_collection == [3, 0, 1, 2]
-    assert [0, 1, 2] == collection == [0, 1, 2]
-    assert mi_collection != [3]
-    assert mi_collection != collection
+# def test_immutable_sequence_add_warning_case():
+#    # mutable + immutable
+#    collection = Vector([0, 1, 2])
+#    mi_collection = [3] + collection
+#    assert mi_collection is not collection
+#    assert not isinstance(mi_collection, Vector)
+#    assert isinstance(mi_collection, list)
+#    assert [3, 0, 1, 2] == mi_collection == [3, 0, 1, 2]
+#    assert [0, 1, 2] == collection == [0, 1, 2]
+#    assert mi_collection != [3]
+#    assert mi_collection != collection
 
 
 # Syntax Error
@@ -147,31 +147,12 @@ def test_immutable_sequence_remove():
     assert [0, 1, 2] == sequence == [0, 1, 2]
 
 
-def test_immutable_sequence_pop():
-    sequence = Vector([0, 1, 2])
-    poped_sequence = sequence.pop(1)
-    assert poped_sequence is not sequence
-    assert isinstance(poped_sequence, Vector)
-    assert isinstance(sequence, Vector)
-    assert [0, 2] == poped_sequence == [0, 2]
-    assert [0, 1, 2] == sequence == [0, 1, 2]
-
-
 def test_immutable_sequence_index():
     sequence = Vector([0, 1, 2])
     index = sequence.index(1, 0, 2)
     assert isinstance(sequence, Vector)
     assert 1 == index
     assert [0, 1, 2] == sequence == [0, 1, 2]
-
-
-def test_immutable_sequence_clear():
-    sequence = Vector([0, 1, 2])
-    try:
-        sequence.clear()
-        assert False
-    except TypeError:
-        assert True
 
 
 def test_immutable_sequence_count():
@@ -182,7 +163,7 @@ def test_immutable_sequence_count():
 
 
 def test_immutable_sequence_sort():
-    sequence = Vector([0, 1, 2])
+    sequence = Vector[int]([0, 1, 2])
     sorted_sequence = sequence.sort(reverse=True)
     assert sorted_sequence is not sequence
     assert isinstance(sorted_sequence, Vector)
@@ -236,7 +217,9 @@ def test_immutable_sequence_map():
 
 def test_immutable_sequence_redece():
     sequence = Vector([0, 1, 2])
-    reduced_sequence = sequence.reduce(function=lambda left, right: left * right)
+    reduced_sequence = sequence.reduce(
+        function=lambda left, right: left * right, initial=1
+    )
     assert reduced_sequence is not sequence
     assert 0 == reduced_sequence
 
@@ -246,14 +229,14 @@ def test_immutable_sequence_dataclass():
     class SeqEntity(Generic[_T]):
         value: Vector[_T] = field(default_factory=Vector[_T])
 
-    entity = SeqEntity(value=Vector())
+    entity = SeqEntity(value=Vector[Any]())
     dict_entity = asdict(entity)
-    entity_from_dict = SeqEntity(**dict_entity)
+    entity_from_dict = SeqEntity[Any](**dict_entity)
     assert {"value": []} == dict_entity == {"value": []}
     assert entity_from_dict == entity == entity_from_dict
 
-    number_entity = SeqEntity(value=Vector([0, 1, 2]))
+    number_entity = SeqEntity(value=Vector[int]([0, 1, 2]))
     dict_number_entity = asdict(number_entity)
-    number_entity_from_dict = SeqEntity(**dict_number_entity)
+    number_entity_from_dict = SeqEntity[int](**dict_number_entity)
     assert {"value": [0, 1, 2]} == dict_number_entity == {"value": [0, 1, 2]}
     assert number_entity_from_dict == number_entity == number_entity_from_dict

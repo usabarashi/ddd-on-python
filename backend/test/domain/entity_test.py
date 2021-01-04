@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from dsl.type import Vector
 
@@ -114,7 +115,7 @@ def test_role_object():
     assert created_entity == roled_entity
     assert created_id == roled_entity.role_method()
     try:
-        _ = created_entity.as_role(Vector)
+        _ = created_entity.as_role(Vector[Any])
         assert False
     except TypeError:
         assert True

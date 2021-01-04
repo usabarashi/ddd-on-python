@@ -1,9 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
 from enum import IntEnum
-from typing import TypeVar
-
-_T = TypeVar("_T")
 
 
 @dataclass(eq=False, frozen=True)

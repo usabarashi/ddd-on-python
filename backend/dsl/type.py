@@ -2,14 +2,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import reduce
-from typing import (Callable, Generic, Iterable, List, Literal, Optional,
-                    Tuple, TypeVar, Union)
+from typing import (Any, Callable, Generic, Iterable, Literal, Optional,
+                    Sequence, TypeVar, Union)
 
 _T = TypeVar("_T")
 _A = TypeVar("_A")
 _B = TypeVar("_B")
-_S = TypeVar("_S")  # Self
-_E = TypeVar("_E")  # Err
+_E = TypeVar("_E", covariant=True)  # Err
 
 
 @dataclass(eq=False, frozen=True)
@@ -37,73 +36,67 @@ class Ok(Generic[_T]):
 Result = Union[Err[_E], Ok[_T]]
 
 
-class Vector(List, Generic[_T]):
+class Vector(Sequence[_T]):
 
-    # Override the list method
+    # Sequence method
 
     # FIXME: delete Tuple[()]
-    def __init__(self, items: Optional[Union[List[_T], Tuple[_T], Tuple[()]]] = None):
+    def __init__(self, items: Optional[Union[list[_T], tuple[_T], tuple[()]]] = None):
         if items is None:
             items = list()
-        list.__init__(self, items)
+        list[_T](items)
 
-    def __add__(self, other: List[_T]):
-        sequence = list(self)
-        return __class__(sequence.__add__(other))
+    # def __getitem__(self, i: int) -> _T_co: ...
+    # def __getitem__(self, s: slice) -> Sequence[_T_co]: ...
 
-    def __setitem__(self, slice_: slice, item: Iterable[_T]) -> None:
-        raise TypeError("Does not support the __setitem__ method")
+    def index(self, value: _T, start: int, stop: int) -> int:
+        return list[_T].index(list(self), value, start, stop)
 
-    def __delitem__(self, slice_: slice) -> None:
-        raise TypeError("Does not support the __delitem__ method")
+    def count(self, value: _T) -> int:
+        return list[_T].count(list(self), value)
 
-    def append(self, obj: _T):
-        sequence = list(self)
-        sequence.append(obj)
-        return __class__(sequence)
-
-    def extend(self, items: Iterable[_T]):
-        sequence = list(self)
-        sequence.extend(items)
-        return __class__(sequence)
-
-    def insert(self, index: int, obj: _T):
-        sequence = list(self)
-        sequence.insert(index, obj)
-        return __class__(sequence)
-
-    def remove(self, obj: _T):
-        sequence = list(self)
-        sequence.remove(obj)
-        return __class__(sequence)
-
-    def pop(self, index: int):
-        sequence = list(self)
-        sequence.pop(index)
-        return __class__(sequence)
-
-    def clear(self: _S) -> None:
-        raise TypeError("Does not support the clear method")
-
-    def index(self, obj: _T, start: int, end: int) -> int:
-        return list.index(self, obj, start, end)
-
-    def count(self, obj: _T) -> int:
-        return list.count(self, obj)
-
-    def sort(
-        self, *, key: None = None, reverse: bool = False,
-    ):
-        sequence = list(self)
-        sequence.sort(key=key, reverse=reverse)
-        return __class__(sequence)
-
-    def reverse(self):
+    def reverse(self) -> Vector[_T]:
         sequence = list(self)
         sequence.reverse()
         return __class__(sequence)
 
-    def copy(self):
+    # def __contains__(self, x: object) -> bool: ...
+    # def __iter__(self) -> Iterator[_T_co]: ...
+    # def __reversed__(self) -> Iterator[_T_co]: ..
+
+    # Base method
+
+    def __add__(self, other: Iterable[_T]) -> Vector[_T]:
+        return __class__(list(self).__add__(list(other)))
+
+    def append(self, obj: _T) -> Vector[_T]:
+        sequence = list(self)
+        sequence.append(obj)
+        return __class__(sequence)
+
+    def extend(self, items: Iterable[_T]) -> Vector[_T]:
+        sequence = list(self)
+        sequence.extend(items)
+        return __class__(sequence)
+
+    def insert(self, index: int, obj: _T) -> Vector[_T]:
+        sequence = list(self)
+        sequence.insert(index, obj)
+        return __class__(sequence)
+
+    def remove(self, obj: _T) -> Vector[_T]:
+        sequence = list(self)
+        sequence.remove(obj)
+        return __class__(sequence)
+
+    def sort(
+        self, *, key: Callable[[_T], SupportsLessThan], reverse: bool = ...
+    ) -> Vector[_T]:
+        sequence = list(self)
+        sequence.sort(key, reverse)
+        return __class__(sequence)
+
+    def copy(self) -> Vector[_T]:
         return __class__(list(self))
 
     # Add functional method
@@ -117,11 +110,14 @@ class Vector(List, Generic[_T]):
     def size(self) -> int:
         return len(self)
 
-    def map(self, /, *, function: Callable[[_T], _A]):
+    # FP mehod
+
+    def map(self, /, *, function: Callable[[_T], _A]) -> Vector[_A]:
         return __class__([function(element) for element in self])
 
-    def reduce(self, /, *, function: Callable[[_T, _T], _T]):
-        return reduce(function, self)
+    def reduce(self, function: Callable[[_T, Any], _T], initial: _T) -> _T:
+        return reduce(function, list(self), initial)
 
-    def filter(self, /, *, function: Callable[[_T], bool]):
+    def filter(self, /, *, function: Callable[[_T], bool]) -> Vector[_T]:
         return __class__([element for element in self if function(element)])
+

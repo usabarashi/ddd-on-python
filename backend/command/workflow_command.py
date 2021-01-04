@@ -1,35 +1,43 @@
 from dataclasses import dataclass
-from typing import Type, TypeVar
+from typing import Type
 
-from domain import application, entity, repository
-from dsl.type import Err, Ok
+from domain import application, entity, repository, workflow
+from dsl.type import Err, Ok, Result
 
-_T = TypeVar("_T")
+import command
 
 
 @dataclass
 class WorkflowCommand:
     repository: Type[repository.Repository]
 
-    async def create(self, /, *, actor_id: entity.Id, workflow_id: entity.Id):
+    async def create(
+        self, /, *, actor_id: entity.Id, workflow_id: entity.Id
+    ) -> Result[command.Error, workflow.Workflow]:
         """ワークフローを新規作成する"""
         raise NotImplementedError
 
-    async def edit(self, /, *, actor_id: entity.Id, application_id: entity.Id):
+    async def edit(
+        self, /, *, actor_id: entity.Id, application_id: entity.Id
+    ) -> Result[command.Error, workflow.Workflow]:
         """ワークフローを編集する"""
         raise NotImplementedError
 
-    async def delete(self, /, *, actor_id: entity.Id, application_id: entity.Id):
+    async def delete(
+        self, /, *, actor_id: entity.Id, application_id: entity.Id
+    ) -> Result[command.Error, workflow.Workflow]:
         """ワークフローを削除する"""
         raise NotImplementedError
 
-    async def apply(self, /, *, actor_id: entity.Id):
+    async def apply(
+        self, /, *, actor_id: entity.Id
+    ) -> Result[command.Error, workflow.Workflow]:
         """申請する"""
         raise NotImplementedError
 
     async def approval(
         self, /, *, actor_id: entity.Id, application_id: entity.Id, comment: str
-    ):
+    ) -> Result[command.Error, application.Application]:
         """申請を承認する"""
 
         actor, approve_application, approve_workflow = await self.repository.get(
@@ -44,9 +52,7 @@ class WorkflowCommand:
         )
 
         if isinstance(result, Err):
-            return Err(value=result.value)
+            return Err(value=command.Error(result.value))
         else:
-            _, saved_application, _ = await self.repository.save(
-                application_entity=result.value
-            )
-            return Ok(value=saved_application)
+            _, _, _ = await self.repository.save(application_entity=result.value)
+            return Ok(value=result.value)

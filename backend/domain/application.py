@@ -3,14 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import IntEnum
-from typing import List, Optional, TypeVar
+from typing import Iterable, Optional, Union
 
 from dsl.type import Err, Ok, Result, Vector
 
 import domain
 from domain import employee, entity, workflow
-
-_S = TypeVar("_S")
 
 
 class Judgment(IntEnum):
@@ -31,16 +29,16 @@ class Progress:
 class Route(Vector[Progress]):
     """承認経路"""
 
-    def __init__(self, sequence: List[Progress] = None):
+    def __init__(self, sequence: Union[Iterable[Progress], None] = None):
         if sequence is None:
-            sequence = []
-        Vector.__init__(self, sequence)
+            sequence = list()
+        list[Progress](sequence)
 
     def is_complete(self) -> bool:
         """決済の有無"""
         return self.map(
             function=lambda progress: progress.approve is Judgment.APPROVED
-        ).reduce(function=lambda left, right: left and right)
+        ).reduce(function=lambda left, right: left and right, initial=True)
 
     def has_approver(self, approver: employee.Employee) -> bool:
         """承認者に含まれているか否か"""
@@ -80,7 +78,7 @@ class Application(entity.Entity):
     id_: entity.Id
     applicant_id: entity.Id
     workflow_id: entity.Id
-    route: Route = field(default_factory=Route)
+    route: Route = Route()
 
     def process(self, approver: employee.Employee, comment: str):
         """処理する"""

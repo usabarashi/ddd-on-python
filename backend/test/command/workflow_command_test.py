@@ -1,15 +1,8 @@
 import asyncio
+from test.domain import entity_test
 from typing import Optional, Tuple
 
-from domain import (
-    application,
-    employee,
-    entity,
-    entity_test,
-    governance,
-    repository,
-    workflow,
-)
+from domain import application, employee, entity, governance, repository, workflow
 from dsl.type import Err, Ok, Vector
 
 from command import workflow_command
@@ -72,9 +65,9 @@ class Test承認:
 
                 @staticmethod
                 async def save(
-                    employee_entity: employee.Employee = None,
-                    application_entity: application.Application = None,
-                    workflow_entity: workflow.Workflow = None,
+                    employee_entity: Optional[employee.Employee] = None,
+                    application_entity: Optional[application.Application] = None,
+                    workflow_entity: Optional[workflow.Workflow] = None,
                 ) -> Tuple[
                     Optional[employee.Employee],
                     Optional[application.Application],
@@ -137,9 +130,9 @@ class Test承認:
 
                 @staticmethod
                 async def save(
-                    employee_entity: employee.Employee = None,
-                    application_entity: application.Application = None,
-                    workflow_entity: workflow.Workflow = None,
+                    employee_entity: Optional[employee.Employee] = None,
+                    application_entity: Optional[application.Application] = None,
+                    workflow_entity: Optional[workflow.Workflow] = None,
                 ) -> Tuple[
                     Optional[employee.Employee],
                     Optional[application.Application],

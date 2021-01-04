@@ -1,12 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import TypeVar
 
-from dsl.type import Err, Ok
+from dsl.type import Err, Ok, Result, Vector
 
 from domain import employee, entity, governance
-
-_S = TypeVar("_S")
 
 
 class Procedure(Enum):
@@ -72,17 +69,27 @@ class ManagerRole(employee.Employee):
 
         return Ok(Workflow(id_=id_, name=name, description=description, duties=duties))
 
-    def edit(self, /, *, workflow: Workflow, name=None, description=None, duties=None):
+    def edit(
+        self,
+        /,
+        *,
+        workflow: Workflow,
+        name: str,
+        description: str,
+        duties: governance.Duties,
+    ) -> Result[Vector[Error], Workflow]:
         """ワークフローを編集する
         FIXME: 申請済がある場合はどうする？
         """
-
+        errors: list[Error] = list()
         if not name:
-            return Err(NoNameError("名称が未定です."))
+            errors.append(NoNameError("名称が未定です."))
         if not description:
-            return Err(NoDescriptionError("説明が未記入です."))
+            errors.append(NoDescriptionError("説明が未記入です."))
         if (not duties) and (duties not in self.duties):
-            return Err(NoJobAuthorityError("職務権限がありません."))
+            errors.append(NoJobAuthorityError("職務権限がありません."))
+        if errors:
+            return Err(Vector(errors))
 
         return Ok(
             workflow._update(

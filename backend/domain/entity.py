@@ -4,8 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import asdict, dataclass, replace
 from typing import Any, Dict, Type, TypeVar
 
-_S = TypeVar("_S")
-_T = TypeVar("_T")
+_T = TypeVar("_T", covariant=True)
 
 
 class Id(ABC):
@@ -46,25 +45,25 @@ class Id(ABC):
 class Entity:
     id_: Id
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Entity) -> bool:
         return self.id_ == other.id_
 
-    def __ne__(self, other) -> bool:
+    def __ne__(self, other: Entity) -> bool:
         return self.id_ != other.id_
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: Entity) -> bool:
         return self.id_ < other.id_
 
-    def __le__(self, other) -> bool:
+    def __le__(self, other: Entity) -> bool:
         return self.id_ <= other.id_
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: Entity) -> bool:
         return self.id_ > other.id_
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: Entity) -> bool:
         return self.id_ >= other.id_
 
-    def _update(self, **changes: ...):
+    def _update(self, **changes: Any):
         return replace(self, **changes)
 
     def as_role(self, role: Type[_T]) -> _T:

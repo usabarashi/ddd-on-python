@@ -19,9 +19,9 @@ class Repository(ABC):
     @staticmethod
     @abstractclassmethod
     async def save(
-        employee_entity: Optional[entity.Entity] = None,
-        application_entity: Optional[entity.Entity] = None,
-        workflow_entity: Optional[entity.Entity] = None,
+        employee_entity: Optional[employee.Employee] = None,
+        application_entity: Optional[application.Application] = None,
+        workflow_entity: Optional[workflow.Workflow] = None,
     ) -> Tuple[
         Optional[employee.Employee],
         Optional[application.Application],

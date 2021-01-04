@@ -3,6 +3,12 @@ from typing import Awaitable, Callable, TypeVar
 _T = TypeVar("_T")
 
 
+class Error(Exception):
+    """コマンドエラー"""
+
+    ...
+
+
 async def transaction(
     function: Callable[..., Awaitable[_T]]
 ) -> Callable[..., Awaitable[_T]]:
