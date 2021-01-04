@@ -1,9 +1,20 @@
 from __future__ import annotations
 
+import inspect
+import traceback
 from dataclasses import dataclass
 from functools import reduce
-from typing import (Any, Callable, Generic, Iterable, Literal, Optional,
-                    Sequence, TypeVar, Union)
+from typing import (
+    Any,
+    Callable,
+    Generic,
+    Iterable,
+    Literal,
+    Optional,
+    Sequence,
+    TypeVar,
+    Union,
+)
 
 _T = TypeVar("_T")
 _A = TypeVar("_A")
@@ -13,6 +24,8 @@ _E = TypeVar("_E", covariant=True)  # Err
 
 @dataclass(eq=False, frozen=True)
 class Err(Generic[_E]):
+    """失敗型"""
+
     value: _E
 
     def __bool__(self) -> Literal[False]:
@@ -24,6 +37,8 @@ class Err(Generic[_E]):
 
 @dataclass(eq=False, frozen=True)
 class Ok(Generic[_T]):
+    """成功型"""
+
     value: _T
 
     def __bool__(self) -> Literal[True]:
@@ -33,10 +48,36 @@ class Ok(Generic[_T]):
         return ok(self.value)
 
 
+# 結果型エイリアス: 純粋関数の戻り値型として用いる
 Result = Union[Err[_E], Ok[_T]]
 
 
+def try_out(function: Callable[..., _T]) -> Callable[..., Result[Exception, _T]]:
+    """試行デコレーター
+
+    状態異存のある関数の失敗を型検査におさめるために用いる
+    
+    成功時: Ok型を返却する
+    失敗時: Err型を返却する
+    """
+
+    def process(*args: Any, **kwargs: Any) -> Result[Exception, _T]:
+        try:
+            return Ok(value=function(*args, **kwargs))
+        except Exception as error:
+            error.args = error.args + (
+                inspect.currentframe().f_code.co_name,
+                args,
+                kwargs,
+                traceback.format_exc(),
+            )
+            return Err(value=error)
+
+    return process
+
+
 class Vector(Sequence[_T]):
+    """不変リスト"""
 
     # Sequence method
 
